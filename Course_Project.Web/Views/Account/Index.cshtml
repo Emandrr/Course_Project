@@ -1,0 +1,124 @@
+﻿@model AccountViewModel
+
+<div class="user-info">
+	<h1>
+		@Model.user.Login
+	</h1>
+	<h1>
+        @Model.user.Email
+	</h1>
+</div>
+<div class="cont">
+    <a asp-controller="Inventory" asp-action="Create" asp-route-id="@Model.user.Id" class="btn">@Localizer["Create new inventory"]</a>
+    <div class="tab-container"> 
+        <nav>
+            <ul class="tab-nav">
+                <li class="tab-item">
+                    <a href="#" class="tab-link active" data-tab="inventories">My Inventories</a>
+                </li>
+                <li class="tab-item">
+                    <a href="#" class="tab-link" data-tab="edit">Edit Inventories</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="my-tab-content" style="display:block;">
+        <div id="inventories-content" class="tab-panel">
+            <table class="table table-striped table-bordered user-table">
+                <thead>
+                    <tr>
+                        <th scope="col">
+                            <input type="checkbox" id="selectDeselect" />
+                        </th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Full Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var invs in Model.UserInventories)
+                    {
+                        <tr data-id="@invs.Id">
+                            <td>
+                                <input type="checkbox" id="@invs.Id" name="InventoryId" value="@invs.Id" class="checkboxtable" />
+                            </td>
+                            <td>@invs.Id</td>
+                            <td>@invs.Title</td>
+                            <td>@invs.Description</td>
+                            <td>
+                                <span class="status-active">Active</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+     </div>
+    <div class="edit-tab-content" style="display:none;">
+        <div id="inventories-content" class="tab-panel">
+            <table class="table table-striped table-bordered user-table">
+                <thead>
+                    <tr>
+                        <th scope="col">
+                            <input type="checkbox" id="selectDeselect" />
+                        </th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Full Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var invs in Model.EditInventories)
+                    {
+                        <tr data-id="@invs.Id">
+                            <td>
+                                <input type="checkbox" id="@invs.Id" name="InventoryId" value="@invs.Id" class="checkboxtable" />
+                            </td>
+                            <td>@invs.Id</td>
+                            <td>@invs.Title</td>
+                            <td>@invs.Description</td>
+                            <td>
+                                <span class="status-active">Active</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+     </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const myTab = document.querySelector(".my-tab-content");
+        const editTab = document.querySelector(".edit-tab-content");
+        const links = document.querySelectorAll(".tab-link");
+
+        links.forEach(link => {
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+
+                const tab = link.dataset.tab;
+
+                if (tab === "edit") {
+                    if (editTab.style.display === "none" || editTab.style.display === "") {
+                        myTab.style.display = "none";
+                        editTab.style.display = "block";
+                    } else {
+                        editTab.style.display = "none";
+                        myTab.style.display = "block";
+                    }
+                }
+
+                if (tab === "inventories") {
+                    myTab.style.display = "block";
+                    editTab.style.display = "none";
+                }
+
+                links.forEach(l => l.classList.remove("active"));
+                link.classList.add("active");
+            });
+        });
+    });
+</script>

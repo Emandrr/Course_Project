@@ -1,0 +1,65 @@
+﻿@model InventoryEditViewModel
+<link rel="stylesheet" href="~/css/inventory.css" />
+<link rel="stylesheet" href="~/css/site.css" />
+<div class="header">
+    <h1>@Model.inventory.Title</h1>
+    <span id="savedBadge" class="saved-badge saved">All changes saved</span>
+</div>
+<button type="button" class="back-arrow" onclick="window.location.href='@Model.ReturnUrl'">
+    <i class="bi bi-arrow-left"></i>
+</button>
+<nav class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('items', this)">Items</button>
+    <button class="nav-tab" onclick="showTab('chat', this)">Chat</button>
+    @if (User.Identity.Name == Model.inventory.User.UserName || User.IsInRole("Admin"))
+    {
+        <button class="nav-tab" onclick="showTab('settings', this)">Settings</button>
+        <button class="nav-tab" onclick="showTab('customid', this)">Custom ID</button>
+        <button class="nav-tab" onclick="showTab('fields', this)">Fields</button>
+        <button class="nav-tab" onclick="showTab('access', this)">Access</button>
+        <button class="nav-tab" onclick="showTab('stats', this)">Stats</button>
+    }
+</nav>
+<div id="tab-content">
+    <div id="items-tab" class="tab-panel active">
+        @await Html.PartialAsync("~/Views/Inventory/Partial/_PartialItems.cshtml", Model)
+    </div>
+    <div id="chat-tab" class="tab-panel">
+        @await Html.PartialAsync("~/Views/Inventory/Partial/_PartialChat.cshtml", Model)
+    </div>
+    @if (User.Identity.Name == Model.inventory.User.UserName || User.IsInRole("Admin")){
+    <div id="settings-tab" class="tab-panel">
+        @await Html.PartialAsync("~/Views/Inventory/Partial/_PartialSettings.cshtml", Model)
+    </div>
+    <div id="customid-tab" class="tab-panel">
+        @await Html.PartialAsync("~/Views/Inventory/Partial/_PartialCustomId.cshtml", Model)
+    </div>
+    <div id="fields-tab" class="tab-panel">
+        @await Html.PartialAsync("~/Views/Inventory/Partial/_PartialFields.cshtml", Model)
+    </div>
+    <div id="access-tab" class="tab-panel">
+        @await Html.PartialAsync("~/Views/Inventory/Partial/_PartialAccess.cshtml", Model)
+    </div>
+    <div id="stats-tab" class="tab-panel">
+        @await Html.PartialAsync("~/Views/Inventory/Partial/_PartialStats.cshtml", Model)
+    </div>
+    }
+</div>
+<script>
+    function showTab(tabName, button) {
+        const allTabs = document.querySelectorAll('.tab-panel');
+        allTabs.forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        const allButtons = document.querySelectorAll('.nav-tab');
+        allButtons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+        const selectedTab = document.getElementById(tabName + '-tab');
+        if (selectedTab) {
+            selectedTab.classList.add('active');
+        }
+        button.classList.add('active');
+    }
+</script>

@@ -1,0 +1,112 @@
+﻿@model Course_Project.Web.ViewModels.InventoryInfoViewModel
+
+<link href="~/css/inventory-details.css" rel="stylesheet" />
+
+<div class="inventory-container">
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            @if (!string.IsNullOrEmpty(Model.Photo))
+            {
+                <div class="inventory-photo-card">
+                    <img src="@Model.Photo" class="inventory-photo" alt="Inventory Photo">
+                </div>
+            }
+            else
+            {
+                <div class="inventory-photo-placeholder">
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <span class="no-image-text">No Image</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-md-9">
+            <div class="inventory-info-card">
+                <div class="card-body">
+                    <h2 class="inventory-title">@Model.inventory.Title</h2>
+                    <p class="inventory-created">
+                        Created (Utc): @Model.inventory.CreationDate
+                    </p>
+                    <p class="inventory-cr">
+                        Created by: @Model.inventory.User.Login
+                    </p>
+                    @if (!string.IsNullOrEmpty(Model.inventory.Description))
+                    {
+                        <p class="inventory-description">@Model.inventory.Description</p>
+                    }
+                    else
+                    {
+                        <p class="inventory-description-empty">(No description provided)</p>
+                    }
+                    @if(User.Identity.IsAuthenticated && (Model.inventory.IsPublic ||Model.inventory.User.UserName==User.Identity.Name ||
+                    User.IsInRole("Admin") || Model.UserAccess.Contains(User.Identity.Name)) ){
+                    <div class="inventory-actions">
+                        <a href="/Inventory/Details/@Model.inventory.PublicId" class="inventory-edit-btn">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <form method="get" asp-action="Add" asp-controller="Item">
+                            <input type="hidden" name="InventoryId" value="@Model.inventory.PublicId" />
+                            <button type="submit" class="add-button">Add item</button>
+                        </form>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            @if (Model.inventory.Items != null && Model.inventory.Items.Any())
+            {
+                <div class="items-table-card">
+                    <div class="items-table-header">
+                        <h4 class="items-title">Items</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="items-table">
+                                <thead class="items-table-head">
+                                    <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Creation Date</th>
+                                        <th scope="col">Likes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.inventory.Items)
+                                    {
+                                        <tr data-id="@item.PublicId">
+                                            <td class="item-name">@item.Name</td>
+                                            <td>@item.CreationDate.ToString("dd.MM.yyyy")</td>
+                                            <td>@item.Likes.Count</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="empty-collection-card">
+                    <div class="card-body text-center py-5">
+                        <h5 class="empty-collection-title">В инвентаре пока ничего нет</h5>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+<script>
+    $(document).ready(function () {
+         $('tbody').on('click', 'tr', function () {
+            const itm = $(this).data('id');
+            window.location.href = '/Item/Information/' + itm;
+         });
+    });
+</script>

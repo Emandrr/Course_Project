@@ -1,0 +1,182 @@
+﻿<form method="post" enctype="multipart/form-data">
+<div class="inventory-edit-container">
+
+        <input type="hidden" name="id" value="@Model.inventory.PublicId" />
+
+        <div class="form-group">
+            <label for="Title" class="form-label">Название инвентаря</label>
+            <input name="Title" id="inventory_Title" value="@Model.inventory.Title" class="form-control" placeholder="Введите название инвентаря" required />
+            <span class="text-danger field-validation-valid" data-valmsg-for="inventory.Title" data-valmsg-replace="true"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="Description" class="form-label">Описание</label>
+            <textarea name="Description" id="inventory_Description" class="form-control" rows="4" placeholder="Введите описание инвентаря">@Model.inventory.Description</textarea>
+            <span class="text-danger field-validation-valid" data-valmsg-for="inventory.Description" data-valmsg-replace="true"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Текущее фото</label>
+            @if (!string.IsNullOrEmpty(Model.Photo))
+            {
+                <div class="current-photo-container mb-3">
+                    <img src="@Model.Photo" alt="Текущее фото" class="current-photo img-thumbnail" style="max-width: 200px; max-height: 200px;" />
+                </div>
+            }
+            else
+            {
+                <div class="no-photo-placeholder mb-3">
+                    <span class="text-muted">Фото не загружено</span>
+                </div>
+            }
+        </div>
+
+        <div class="form-group">
+            <label for="imageFile" class="form-label">Загрузить новое фото</label>
+            <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*" />
+            <small class="form-text text-muted">Поддерживаемые форматы: JPG, PNG. Максимальный размер: 5MB</small>
+        </div>
+        <div class="form-group">
+            <label for="SelectedCategoryId" class="control-label"></label>
+            <select name="SelectedCategoryId"  class="form-control">
+                @foreach (var category in Model.Categories)
+                {
+                    <option value="@category.Id"
+                            selected="@(category.Id == Model.inventory.CategoryId)">
+                        @category.Name
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="tagInput">Tags</label>
+            <input type="text" id="tagInput" placeholder="Начни вводить тег" class="form-control" />
+            <div id="suggestions" class="suggestions"></div>
+            <div id="selectedTags" class="selected-tags">
+                @foreach (var tag in Model.InvTags)
+                {
+                    <span class="tag">
+                        @tag
+                        <button type="button" class="remove-tag">×</button>
+                    </span>
+                }
+            </div>
+            <input type="hidden" name="InvTags" id="hiddenTags"
+                   value='@Html.Raw(System.Text.Json.JsonSerializer.Serialize<List<string>>(Model.InvTags))' />
+
+        </div>
+
+</div>
+
+<button type="submit" class="btn btn-sm btn-danger" asp-action="Save" asp-controller="Inventory" >
+    <i class="fas fa-ban me-1"></i>Save
+</button>
+<button type="submit" class="btn btn-sm btn-success" asp-action="Delete" asp-controller="Inventory" >
+    <i class="fas fa-unlock-alt me-1"></i>Delete
+</button>
+</form>
+<script>
+    document.getElementById('imageFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const currentPhotoContainer = document.querySelector('.current-photo-container');
+                const noPhotoPlaceholder = document.querySelector('.no-photo-placeholder');
+
+                if (currentPhotoContainer) {
+                    currentPhotoContainer.innerHTML = '<img src="' + e.target.result + '" alt="Предварительный просмотр" class="current-photo img-thumbnail" style="max-width: 200px; max-height: 200px;" />';
+                } else if (noPhotoPlaceholder) {
+                    noPhotoPlaceholder.innerHTML = '<img src="' + e.target.result + '" alt="Предварительный просмотр" class="current-photo img-thumbnail" style="max-width: 200px; max-height: 200px;" />';
+                    noPhotoPlaceholder.className = 'current-photo-container mb-3';
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        const $selectedTags = $("#selectedTags");
+        const $hiddenTags = $("#hiddenTags");
+        const $input = $("#tagInput");
+        const $suggestions = $("#suggestions");
+        const allTags = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AllTags));
+
+        let chosen = [];
+
+        $selectedTags.find(".tag").each(function () {
+            const $span = $(this);
+            const tagName = $span.contents().get(0).nodeValue.trim();
+            chosen.push(tagName);
+
+            $span.find(".remove-tag").click(function () {
+                chosen = chosen.filter(t => t !== tagName);
+                $span.remove();
+                syncHidden();
+            });
+        });
+
+        function syncHidden() {
+            $hiddenTags.val(JSON.stringify(chosen));
+        }
+
+        function addTag(name) {
+            if (chosen.includes(name)) return;
+
+            chosen.push(name);
+
+            const $span = $("<span>").addClass("tag").text(name);
+            const $removeBtn = $("<button>").attr("type", "button").addClass("remove-tag").text("×");
+
+            $removeBtn.click(function () {
+                chosen = chosen.filter(t => t !== name);
+                $span.remove();
+                syncHidden();
+            });
+
+            $span.append($removeBtn);
+            $selectedTags.append($span);
+
+            syncHidden();
+        }
+
+
+        $input.on("input", function () {
+            const query = $(this).val().trim().toLowerCase();
+            $suggestions.empty();
+            if (!query) return;
+
+            const matches = allTags.filter(t =>
+                t.toLowerCase().includes(query) &&
+                !chosen.includes(t)
+            );
+
+            matches.forEach(tag => {
+                const $div = $("<div>").addClass("suggestion").text(tag);
+                $div.click(function () {
+                    addTag(tag);
+                    $input.val("");
+                    $suggestions.empty();
+                });
+                $suggestions.append($div);
+            });
+        });
+
+        $input.on("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const text = $(this).val().trim();
+                if (text && !chosen.includes(text)) {
+                    addTag(text);
+                    $input.val("");
+                    $suggestions.empty();
+                }
+            }
+        });
+
+
+        syncHidden();
+    });
+
+</script>

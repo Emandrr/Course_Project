@@ -1,0 +1,540 @@
+﻿<div class="id-content">
+	<div id="customIdsValContainer">
+		@for (int i = 0; i < ViewData.Model?.Ids.Count; i++)
+		{
+			<div class="id-wrapper" data-id="@i">
+				<input type="hidden" name="Ids[@i]" value="@ViewData.Model.Ids[i]" />
+				<div class="form-group">
+					<pre class="form-control utf-preview">@ViewData.Model.Ids[i]</pre>
+				</div>
+			</div>
+		}
+	</div>
+
+    <div class="id-sidebar">
+        <form method="post" asp-controller="inventory" asp-action="UpdateCustomId" enctype="multipart/form-data" id="customIdsForm">
+            <div id="customIdsContainer">
+                @for (int i = 0; i < ViewData.Model.inventory.CustomSetOfIds.Count; i++)
+                {
+                    var customId = ViewData.Model.inventory.CustomSetOfIds[i];
+                    <div class="custom-id-group" data-id="@i" draggable="true">
+                        <input type="hidden" name="CustomSetOfIds.Index" value="@i" />
+
+                        <div class="form-group">
+                            <label>Element Type</label>
+                            <select name="CustomSetOfIds[@i].IdType" class="form-control id-type-select" data-index="@i">
+                                <option value="Text" selected="@(customId.IdType == IdType.Text)">Single Line Text</option>
+                                <option value="Rand20Bit" selected="@(customId.IdType == IdType.Rand20Bit)">Random 20-bit</option>
+                                <option value="Rand32Bit" selected="@(customId.IdType == IdType.Rand32Bit)">Random 32-bit</option>
+                                <option value="Rand6Digit" selected="@(customId.IdType == IdType.Rand6Digit)">Random 6 Digits</option>
+                                <option value="Rand9Digit" selected="@(customId.IdType == IdType.Rand9Digit)">Random 9 Digits</option>
+                                <option value="GUID" selected="@(customId.IdType == IdType.GUID)">GUID</option>
+                                <option value="DateTime" selected="@(customId.IdType == IdType.DateTime)">Date Time</option>
+                                <option value="Sequence" selected="@(customId.IdType == IdType.Sequence)">Sequence</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label>Value</label>
+                            @{
+                                string ruleValue = customId.Rule;
+                                int maxLength = 100;
+                                string placeholder = "Enter value";
+
+                                switch (customId.IdType)
+                                {
+                                    case IdType.Text:
+                                    case IdType.Rand6Digit:
+                                    case IdType.Rand9Digit:
+                                    case IdType.Sequence:
+                                    case IdType.GUID:
+                                        maxLength = 1;
+                                        placeholder = "Enter separator";
+                                        if (string.IsNullOrEmpty(ruleValue)) ruleValue = "-";
+                                        break;
+                                    case IdType.Rand20Bit:
+                                    case IdType.Rand32Bit:
+                                        maxLength = 10;
+                                        placeholder = "Enter zeros for leading zeros";
+                                        if (string.IsNullOrEmpty(ruleValue)) ruleValue = "no-zeros";
+                                        break;
+                                    case IdType.DateTime:
+                                        maxLength = 4;
+                                        placeholder = "Enter year, month, or date";
+                                        if (string.IsNullOrEmpty(ruleValue)) ruleValue = "year";
+                                        break;
+                                }
+                            }
+                            <input type="text"
+                                   name="CustomSetOfIds[@i].Rule"
+                                   class="form-control universal-field"
+                                   data-index="@i"
+                                   value="@ruleValue"
+                                   maxlength="@maxLength"
+                                   placeholder="@placeholder" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </form>
+    </div>
+
+
+	<button type="button" id="addIdsBtn" class="btn btn-primary mt-2">Add Id</button>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let elemIndex = $('#customIdsContainer .custom-id-group').length; 
+        let Changes = false;
+        let Timer = null;
+        const savedBadge = $('#savedBadge');
+
+        function updateSaveStatus(status) {
+            savedBadge.removeClass('saved unsaved saving');
+            switch(status) {
+                case 'saved':
+                    savedBadge.addClass('saved').text('All changes saved');
+                    break;
+                case 'unsaved':
+                    savedBadge.addClass('unsaved').text('Not saved');
+                    break;
+                case 'saving':
+                    savedBadge.addClass('saving').text('Saving...');
+                    break;
+            }
+        }
+
+        function saveFormCustomId() {
+            if (!Changes) return;
+            updateSaveStatus('saving');
+
+            const formData = new FormData($('#customIdsForm')[0]);
+            formData.append('inventoryId', '@Model.inventory.PublicId' );
+            $.ajax({
+                url: '/Inventory/UpdateCustomId',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    updateSaveStatus('saved');
+                    Changes = false;
+                },
+                error: function(response){
+                    updateSaveStatus('unsaved');
+                }
+            });
+        }
+
+        function startSaveTimerCustomId() {
+            if (Timer) {
+                clearTimeout(Timer);
+            }
+            Timer = setTimeout(saveFormCustomId, 3000);
+        }
+
+        $('#customIdsForm').on('input change', 'input, select', function() {
+            Changes = true;
+            updateSaveStatus('unsaved');
+            startSaveTimerCustomId();
+        });
+
+        $('#addIdsBtn').click(function () {
+            const newElemHtml = createCustomIdGroup(elemIndex);
+            $('#customIdsContainer').append(newElemHtml);
+
+            initDrag();
+            AddId(elemIndex);
+            elemIndex++;
+
+            Changes = true;
+            updateSaveStatus('unsaved');
+            startSaveTimerCustomId();
+        });
+
+        function createCustomIdGroup(index) {
+            return `
+                <div class="custom-id-group" data-id="${index}" draggable="true">
+                    <input type="hidden" name="CustomSetOfIds.Index" value="${index}" />
+                    <div class="form-group">
+                        <label>Element Type</label>
+                        <select name="CustomSetOfIds[${index}].IdType" class="form-control id-type-select" data-index="${index}">
+                            <option value="Text">Single Line Text</option>
+                            <option value="Rand20Bit">Random 20-bit</option>
+                            <option value="Rand32Bit">Random 32-bit</option>
+                            <option value="Rand6Digit">Random 6 Digits</option>
+                            <option value="Rand9Digit">Random 9 Digits</option>
+                            <option value="GUID">GUID</option>
+                            <option value="DateTime">Date Time</option>
+                            <option value="Sequence">Sequence</option>
+                        </select>
+                    </div>
+
+                    <div class="rule-input" data-index="${index}">
+                        ${getRuleInputForType('Text', index)}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getRuleInputForType(type, index) {
+            switch(type) {
+                case 'Rand6Digit':
+                case 'Rand9Digit':
+                case 'Text':
+                    return `
+                        <div class="form-group">
+                            <label class="rule-label">Text Separator (single character)</label>
+                            <input type="text"
+                                   name="CustomSetOfIds[${index}].Rule"
+                                   class="form-control universal-field"
+                                   data-index="${index}"
+                                   value="-"
+                                   maxlength="1"
+                                   placeholder="Enter separator" />
+                        </div>
+                    `;
+
+                case 'Rand20Bit':
+                case 'Rand32Bit':
+                    return `
+                        <div class="form-group">
+                            <label class="rule-label">Zeros label</label>
+                            <input type="text"
+                                   name="CustomSetOfIds[${index}].Rule"
+                                   class="form-control universal-field"
+                                   data-index="${index}"
+                                   value="no-zeros"
+                                   maxlength="10"
+                                   placeholder="Enter zeros for leading zeros" />
+                        </div>
+                    `;
+
+                case 'GUID':
+                    return `
+                        <div class="form-group">
+                            <label class="rule-label">GUID Separator (single character)</label>
+                            <input type="text"
+                                   name="CustomSetOfIds[${index}].Rule"
+                                   class="form-control universal-field"
+                                   data-index="${index}"
+                                   value="-"
+                                   maxlength="1"
+                                   placeholder="Enter separator" />
+                        </div>
+                    `;
+
+                case 'DateTime':
+                    return `
+                        <div class="form-group">
+                            <label class="rule-label">Date Format</label>
+                            <input type="text"
+                                   name="CustomSetOfIds[${index}].Rule"
+                                   class="form-control universal-field"
+                                   data-index="${index}"
+                                   value="year"
+                                   maxlength="4"
+                                   placeholder="Enter year, month, or date" />
+                        </div>
+                    `;
+
+                case 'Sequence':
+                    return `
+                        <div class="form-group">
+                            <label class="rule-label">Sequence Separator (single character)</label>
+                            <input type="text"
+                                   name="CustomSetOfIds[${index}].Rule"
+                                   class="form-control universal-field"
+                                   data-index="${index}"
+                                   value="-"
+                                   maxlength="1"
+                                   placeholder="Enter separator" />
+                        </div>
+                    `;
+
+                default:
+                    return `
+                        <div class="form-group">
+                            <label class="rule-label">Value</label>
+                            <input type="text"
+                                   name="CustomSetOfIds[${index}].Rule"
+                                   class="form-control universal-field"
+                                   data-index="${index}"
+                                   value="-"
+                                   placeholder="Enter value" />
+                        </div>
+                    `;
+            }
+        }
+
+        $(document).on('change', '.id-type-select', function() {
+            const index = $(this).data('index');
+            const selectedType = $(this).val();
+
+            const group = $(this).closest('.custom-id-group');
+
+            let ruleContainer = group.find(`.rule-input[data-index="${index}"]`);
+            if (ruleContainer.length === 0) {
+                const existing = group.find('.form-group.col-md-6').first();
+                if (existing.length) {
+                    existing.wrap(`<div class="rule-input" data-index="${index}"></div>`);
+                    ruleContainer = group.find(`.rule-input[data-index="${index}"]`);
+                } else {
+                    ruleContainer = $(`<div class="rule-input" data-index="${index}"></div>`);
+                    group.append(ruleContainer);
+                }
+            }
+
+
+            ruleContainer.html(getRuleInputForType(selectedType, index));
+
+
+            const rule = getDefaultRuleValue(selectedType);
+            const newInput = ruleContainer.find('.universal-field');
+            newInput.val(rule); 
+
+            RegenerateId(index, rule, getTypeNumber(selectedType));
+
+            Changes = true;
+            updateSaveStatus('unsaved');
+            startSaveTimerCustomId();
+        });
+
+
+        function getDefaultRuleValue(type) {
+            switch(type) {
+                case 'Rand6Digit':
+                case 'Rand9Digit':
+                case 'Text':
+                case 'GUID':
+                case 'Sequence':
+                    return '-';
+                case 'Rand20Bit':
+                case 'Rand32Bit':
+                    return 'no-zeros';
+                case 'DateTime':
+                    return 'year';
+                default:
+                    return '-';
+            }
+        }
+
+        $(document).on('input change', '.universal-field', function() {
+            const index = $(this).data('index');
+            let rule;
+
+            if ($(this).attr('type') === 'radio') {
+                rule = $(`input[name="CustomSetOfIds[${index}].Rule"]:checked`).val() || getDefaultRuleValue('Text');
+            } else {
+                rule = $(this).val() || getDefaultRuleValue('Text');
+            }
+
+            const selectedType = $(`.custom-id-group[data-id="${index}"] .id-type-select`).val();
+            RegenerateId(index, rule, getTypeNumber(selectedType));
+
+            Changes = true;
+            updateSaveStatus('unsaved');
+            startSaveTimerCustomId();
+        });
+
+        const container = document.getElementById("customIdsContainer");
+        let dragged = null;
+
+        function AddId(elemIndex) {
+            const newElemHtml = `
+                <div class="id-wrapper" data-id="${elemIndex}">
+                    <input type="hidden" name="Ids[${elemIndex}]" value="" />
+                    <div class="form-group">
+                        <pre class="form-control utf-preview" data-preview-id="${elemIndex}"></pre>
+                    </div>
+                </div>
+            `;
+            $('#customIdsValContainer').append(newElemHtml);
+
+            GenerateId(elemIndex, '-', 0);
+        }
+
+        function RemoveId(elemIndex) {
+            $(`.id-wrapper[data-id="${elemIndex}"]`).remove();
+        }
+
+        function RegenerateId(elemIndex, rule, type) {
+            GenerateId(elemIndex, rule, type);
+        }
+
+        function GenerateId(elemIndex, rule, type) {
+            const generatedValue = generateIdValue(rule, type);
+
+            
+            $(`.id-wrapper[data-id="${elemIndex}"] .utf-preview`).text(generatedValue);
+
+           
+            $(`.id-wrapper[data-id="${elemIndex}"] input[name="Ids[${elemIndex}]"]`).val(generatedValue);
+
+        }
+
+        function generateIdValue(rule, type) {
+            const now = new Date();
+
+            switch(type) {
+                case 0: 
+                    const sep = rule || '-';
+                    return `${Math.random().toString(36).substring(2, 8).toUpperCase()}${sep}`;
+
+                case 1: 
+                    const val20 = Math.floor(Math.random() * (1048575 + 1));
+                    if (rule === 'zeros') {
+                        return val20.toString(16).toUpperCase().padStart(8, '0')+"-";
+                    }
+                    return val20.toString(16).toUpperCase()+"-";
+
+                case 2: 
+                    const val32 = Math.floor(Math.random() * (4294967295 + 1));
+                    if (rule === 'zeros') {
+                        return val32.toString(16).toUpperCase().padStart(10, '0')+"-";
+                    }
+                    return val32.toString(16).toUpperCase()+"-";
+
+                case 3: 
+                    const val6 = Math.floor(Math.random() * 900000) + 100000;
+                    return val6.toString() + (rule || '-');
+
+                case 4: 
+                    const val9 = Math.floor(Math.random() * 900000000) + 100000000;
+                    return val9.toString() + (rule || '-');
+
+                case 5: 
+                    const sep5 = rule || '-';
+                    const guid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                        return v.toString(16);
+                    });
+                    return guid+sep5;
+
+                case 6: 
+                    switch(rule.toLowerCase()) {
+                        case 'year':
+                            return now.getFullYear().toString()+"-";
+                        case 'month':
+                            return `${(now.getMonth() + 1).toString().padStart(2, '0')}`+"-";
+                        case 'date':
+                            return `${now.getDate().toString().padStart(2, '0')}`+"-";
+                        default:
+                            return now.toISOString().split('T')[0];
+                    }
+
+                case 7: 
+                    const sep7 = rule || '-';
+                    return `${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}${sep7}`;
+
+                default:
+                    return Math.random().toString(36).substring(2, 8).toUpperCase();
+            }
+        }
+
+        function getTypeNumber(typeString) {
+            const typeMap = {
+                'Text': 0,
+                'Rand20Bit': 1,
+                'Rand32Bit': 2,
+                'Rand6Digit': 3,
+                'Rand9Digit': 4,
+                'GUID': 5,
+                'DateTime': 6,
+                'Sequence': 7
+            };
+            return typeMap[typeString] || 0;
+        }
+
+        function initDrag() {
+            Array.from(container.querySelectorAll(".custom-id-group")).forEach(el => {
+                el.setAttribute("draggable", "true");
+            });
+        }
+
+        container.addEventListener("dragstart", e => {
+            if (e.target.classList.contains("custom-id-group")) {
+                dragged = e.target;
+                e.dataTransfer.effectAllowed = "move";
+            }
+        });
+
+        container.addEventListener("dragover", e => {
+            e.preventDefault();
+            const target = e.target.closest(".custom-id-group");
+            if (target && target !== dragged) {
+                const rect = target.getBoundingClientRect();
+                const next = (e.clientY - rect.top) / (rect.height) > 0.5;
+                container.insertBefore(dragged, next ? target.nextSibling : target);
+            }
+        });
+
+        container.addEventListener("drop", e => {
+            e.preventDefault();
+            if (dragged) {
+                const target = e.target.closest(".custom-id-group");
+                const draggedIndex = parseInt(dragged.dataset.id);
+
+                const next = target && (e.clientY - target.getBoundingClientRect().top) / target.getBoundingClientRect().height > 0.5;
+                container.insertBefore(dragged, next ? target.nextSibling : target);
+                updateValContainerOrder();
+                Changes = true;
+                updateSaveStatus('unsaved');
+                startSaveTimerCustomId();
+            }
+            dragged = null;
+        });
+
+        document.addEventListener("drop", e => {
+            if (dragged && !container.contains(e.target)) {
+                const index = dragged.getAttribute('data-id');
+                dragged.remove();
+                RemoveId(index);
+                Changes = true;
+                updateSaveStatus('unsaved');
+                startSaveTimerCustomId();
+            }
+            dragged = null;
+        });
+        function updateValContainerOrder() {
+        const valContainer = $('#customIdsValContainer');
+        const newOrder = [];
+
+        $('#customIdsContainer .custom-id-group').each(function(idx, elem){
+            const index = $(elem).data('id');
+            const wrapper = valContainer.find(`.id-wrapper[data-id="${index}"]`);
+            if(wrapper.length){
+                newOrder.push(wrapper);
+            }
+        });
+        valContainer.empty();
+        newOrder.forEach(wrapper => valContainer.append(wrapper));
+        }
+
+        document.addEventListener("dragover", e => {
+            e.preventDefault();
+        });
+
+        $(window).on('beforeunload', function() {
+            if (Changes) {
+                return 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        });
+
+        $('#customIdsContainer .custom-id-group').each(function() {
+            const index = $(this).data('id');
+            const selectedType = $(this).find('.id-type-select').val();
+            const rule = $(this).find('.universal-field').val() || getDefaultRuleValue(selectedType);
+
+
+            if ($(`.id-wrapper[data-id="${index}"]`).length === 0) {
+                AddId(index);
+            }
+
+            RegenerateId(index, rule, getTypeNumber(selectedType));
+        });
+
+        initDrag();
+    });
+</script>

@@ -1,0 +1,67 @@
+﻿[data-bs-theme="dark"] {
+    --table-bg: #2b2b2b;
+    --table-header-bg: #1a1a1a;
+    --table-row-hover: #333333;
+    --table-border: #404040;
+    --nav-bg: #333333;
+    --status-active: #28a745;
+    --status-blocked: #dc3545;
+}
+
+[data-bs-theme="light"] {
+    --table-bg: #c8f4fb;
+    --table-header-bg: #a8d8e6;
+    --table-row-hover: #b8e4f1;
+    --table-border: #9ec5d1;
+    --nav-bg: #f8f9fa;
+    --status-active: #198754;
+    --status-blocked: #dc3545;
+}
+
+.user-table {
+    background-color: var(--table-bg);
+    border: 1px solid var(--table-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+    .user-table thead th {
+        background-color: var(--table-header-bg);
+        border: 1px solid var(--table-border);
+        padding: 12px;
+        font-weight: 600;
+    }
+
+    .user-table tbody td {
+        background-color: var(--table-bg);
+        border: 1px solid var(--table-border);
+        padding: 12px;
+    }
+
+    .user-table tbody tr:hover td {
+        background-color: var(--table-row-hover);
+    }
+
+.nav.navbar {
+    background-color: var(--nav-bg);
+    border: 1px solid var(--table-border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+
+.status-active {
+    color: var(--status-active);
+    font-weight: 600;
+}
+
+.status-blocked {
+    color: var(--status-blocked);
+    font-weight: 600;
+}
+
+.checkboxtable, #selectDeselect {
+    width: 16px;
+    height: 16px;
+}

@@ -3,10 +3,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
     background-color: var(--bs-body-bg);
+    height: 100vh;
 }
-
+.soc-links {
+    text-align: center;
+}
+.back-arrow {
+    border:none;
+    background: none;
+}
 .login-container {
     width: 100%;
     max-width: 400px;
@@ -69,10 +75,6 @@
     border-radius: 6px;
     cursor: pointer;
 }
-
-    .login-button:hover {
-        background-color: var(--bs-primary-hover);
-    }
 
 .register-link {
     text-align: center;

@@ -1,0 +1,38 @@
+﻿@model ItemViewModel
+<link rel="stylesheet" href="~/css/site.css" />
+@if (!string.IsNullOrEmpty(Model.Photo))
+{
+    <div class="inventory-photo-card">
+        <img src="@Model.Photo" class="inventory-photo" alt="Inventory Photo">
+    </div>
+}
+else
+{
+    <div class="inventory-photo-placeholder">
+        <div class="card-body d-flex align-items-center justify-content-center">
+            <span class="no-image-text">No Image</span>
+        </div>
+    </div>
+}
+<form id="addItemForm" method="post" asp-action="Like" >
+	<input type="hidden" name="CreatorName" value="@User.Identity.Name" />
+	<input type="hidden" name="ItmId" value="@Model.Item.PublicId" />
+	@if (Model.HasChance)
+	{
+		<button id="submitBtn" type="submit" class="like-btn">like</button>
+	}
+</form>
+html
+<form action="/Item/Edit/@Model.Item.PublicId" method="get" >
+    <button type="submit" class="item-edit-btn">
+        <i class="fas fa-edit"></i> Edit
+    </button>
+</form>
+<script>
+    $(function () {
+        $("#addItemForm").on("submit", function () {
+            var $btn = $("#submitBtn");
+            $btn.prop("disabled", true);
+        });
+    });
+</script>

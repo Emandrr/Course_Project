@@ -1,27 +1,31 @@
-﻿using Course_Project.Application.Services;
+﻿using Course_Project.Application.Interfaces;
+using Course_Project.Domain.Models;
 using Course_Project.Web.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Course_Project.Domain.Models;
+using System.Security.Claims;
 namespace Course_Project.Web.Controllers
 {
     public class AuthController:Controller
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
         private readonly string EmailProblem = "DuplicateEmail";
-        public AuthController(UserManager<User>userManager,SignInManager<User> signInManager,AuthService authService)
+        public AuthController(IAuthService authService)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
             _authService = authService;
         }
         [Authorize(Policy = "NotAuthenticated")]
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
+            if (TempData.TryGetValue("AuthError", out object error) && error is string errorMessage)
+            {
+                ModelState.AddModelError(string.Empty, errorMessage);
+            }
             return View(new LoginViewModel { ReturnUrl = returnUrl });
         }
         [Authorize(Policy = "NotAuthenticated")]
@@ -32,8 +36,8 @@ namespace Course_Project.Web.Controllers
             {
                 var answer = await _authService.LoginAsync(model.Email,model.Password);
                 if (answer.IsLockedOut) ModelState.AddModelError(string.Empty, "You are blocked");
-                else if (!answer.Succeeded) ModelState.AddModelError(string.Empty, "Invalid login and (or) password");
-                if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl)) return Redirect(model.ReturnUrl);
+                else if (!answer.Succeeded) ModelState.AddModelError(string.Empty, "Invalid email and (or) password");
+                if (!answer.Succeeded) return View(model);
                 return RedirectToAction("Index", "Home");
             }
             return View(model);
@@ -58,6 +62,62 @@ namespace Course_Project.Web.Controllers
                 }
             }
             return View(model);
+        }
+        [Authorize(Policy = "NotAuthenticated")]
+        public async Task GoogleLogin()
+        {
+            await HttpContext.ChallengeAsync(GoogleDefaults.AuthenticationScheme,
+                new AuthenticationProperties
+                {
+                    RedirectUri = Url.Action("GoogleResponse"),
+                    Items = { { "prompt", "select_account" } }
+                });
+        }
+
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var res = await Login();
+            if (res.Succeeded) return RedirectToAction("Index", "Home",new { area = "" });
+            else
+            {
+                TempData["AuthError"] = "Login with Google failed";
+                return RedirectToAction("Login", "Auth");
+            }
+        }
+        [Authorize(Policy = "NotAuthenticated")]
+        public IActionResult LinkedInLogin()
+        {
+            var redirectUri = Url.Action("LinkedinResponse", "Auth", null, Request.Scheme);
+            var properties = new AuthenticationProperties
+            {
+                RedirectUri = redirectUri,
+                Items =
+        {
+            { "prompt", "login" }
+        }
+            };
+            return Challenge(properties, "LinkedIn");
+        }
+        private async Task<Microsoft.AspNetCore.Identity.SignInResult> Login()
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return await _authService.LoginWithExternalAsync(result.Principal);
+        }
+        public async Task<IActionResult> LinkedInResponse()
+        {
+            var res = await Login();
+            if (res.Succeeded) return RedirectToAction("Index", "Home");
+            else
+            {
+                TempData["AuthError"] = "Login with Linkedin failed";
+                return RedirectToAction("Login", "Auth");
+            }
+        }
+        public async Task<IActionResult> Logout()
+        {
+            await _authService.LogoutAsync();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Home", new { area = "" });
         }
     }
 }

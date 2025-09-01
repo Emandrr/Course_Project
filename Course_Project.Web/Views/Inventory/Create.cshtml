@@ -1,0 +1,229 @@
+﻿@model Course_Project.Web.ViewModels.InventoryCreateViewModel;
+<link rel="stylesheet" href="~/css/inventory.css" />
+
+<div class="project-wrapper">
+	<h1 class="inventory-title">Create new inventory</h1>
+
+	<form method="post" asp-controller="Inventory" asp-action="Create" enctype="multipart/form-data">
+		<div class="content-container">
+			<div class="main-form">
+				<div class="form-group">
+					<label for="Title">Title</label>
+					<input name="Title" id="Title" type="text" autocomplete="on" placeholder="Enter title" />
+					<span class="text-danger field-validation-valid" data-valmsg-for="inventory.Title" data-valmsg-replace="true"></span>
+				</div>
+
+				<div class="form-group">
+					<label for="Description">Description</label>
+					<input name="Description" id="Description" type="text" autocomplete="on" placeholder="Enter description" />
+					<div class="validation-message"></div>
+				</div>
+
+				<div class="form-group form-check">
+					<input asp-for="IsPublic" class="form-check-input" />
+					<label asp-for="IsPublic" class="form-check-label">Public</label>
+					<span asp-validation-for="IsPublic" class="text-danger"></span>
+				</div>
+
+				<div class="form-group">
+					<label for="ImageFile">Выберите фотографию</label>
+					<input name="ImageFile" id="ImageFile" type="file" class="form-control-file" accept="image/*">
+					<span class="text-danger"></span>
+				</div>
+
+				<div id="imagePreview" class="mt-3"></div>
+
+				<input type="hidden" name="UserId" value="@Model.UserId" />
+
+				<div class="form-buttons">
+					<button type="button" id="addElemBtn" class="btn btn-secondary">Add Element</button>
+					<button type="submit" class="login-button">Create new inventory</button>
+				</div>
+				<div class="form-group">
+					<label asp-for="SelectedCategoryId" class="control-label"></label>
+					<select asp-for="SelectedCategoryId" asp-items="@(new SelectList(Model.Categories, "Id", "Name"))" class="form-control">
+					</select>
+					<span asp-validation-for="SelectedCategoryId" class="text-danger"></span>
+				</div>
+			</div><div class="form-group">
+				<label for="tagInput">Tags</label>
+				<input type="text" id="tagInput" placeholder="Начни вводить тег" class="form-control" />
+				<div id="suggestions" class="suggestions"></div>
+				<div id="selectedTags" class="selected-tags"></div>
+				<input type="hidden" name="Tags" id="hiddenTags" />
+			</div>
+			<div class="elements-sidebar">
+				<h3 class="elements-title">Custom Elements</h3>
+				<div id="customElemsContainer">
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<script>
+	$(document).ready(function () {
+		let elemIndex = @Model.CustomElems.Count;
+		$('#addElemBtn').click(function () {
+			const newElemHtml = `
+				<div class="custom-elem-group" data-id="${elemIndex}" draggable="true">
+				<input type="hidden" name="CustomElems.Index" value="${elemIndex}" />
+					<div class="form-group">
+						<label>Element Name</label>
+						<input name="CustomElems[${elemIndex}].Name" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>Element Type</label>
+						<select name="CustomElems[${elemIndex}].FieldType" class="form-control">
+							<option value="SingleLine">Single Line Text</option>
+							<option value="MultiLine">Multiline Text</option>
+							<option value="Numeric">Number</option>
+							<option value="Checkbox">Boolean</option>
+							<option value="Link">Link</option>
+						</select>
+					</div>
+					<div class="checkbox-group">
+						<input type="checkbox" id="isVisible_${elemIndex}" name="CustomElems[${elemIndex}].IsVisible" />
+						<label for="isVisible">Visible</label>
+					</div>
+				</div>
+			`;
+			$('#customElemsContainer').append(newElemHtml);
+			elemIndex++;
+
+			initDraggable();
+		});
+
+		const container = document.getElementById("customElemsContainer");
+		let dragged = null;
+
+		function initDraggable() {
+			Array.from(container.querySelectorAll(".custom-elem-group")).forEach(el => {
+				el.setAttribute("draggable", "true");
+			});
+		}
+		initDraggable();
+
+		container.addEventListener("dragstart", e => {
+			if (e.target.classList.contains("custom-elem-group")) {
+				dragged = e.target;
+				e.dataTransfer.effectAllowed = "move";
+			}
+		});
+
+		container.addEventListener("dragover", e => {
+			e.preventDefault();
+			const target = e.target.closest(".custom-elem-group");
+			if (target && target !== dragged) {
+				const rect = target.getBoundingClientRect();
+				const next = (e.clientY - rect.top) / (rect.height) > 0.5;
+				container.insertBefore(dragged, next ? target.nextSibling : target);
+			}
+		});
+
+		container.addEventListener("drop", e => {
+			e.preventDefault();
+			dragged = null;
+		});
+
+		document.addEventListener("drop", e => {
+			if (dragged && !container.contains(e.target)) {
+				dragged.remove();
+			}
+			dragged = null;
+		});
+
+		document.addEventListener("dragover", e => {
+			e.preventDefault();
+		});
+		document.getElementById('ImageFile').addEventListener('change', function (e) {
+			const file = e.target.files[0];
+			if (file) {
+				const previewContainer = document.getElementById('imagePreview');
+				previewContainer.innerHTML = '';
+
+				const img = document.createElement('img');
+				img.src = URL.createObjectURL(file);
+				img.classList.add('img-thumbnail');
+				img.style.maxHeight = '200px';
+
+				previewContainer.appendChild(img);
+			}
+		});
+	});
+</script>
+<script>
+	const allTags = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AllTags));
+
+	const input = document.getElementById("tagInput");
+	const suggestions = document.getElementById("suggestions");
+	const selectedTags = document.getElementById("selectedTags");
+	const hiddenTags = document.getElementById("hiddenTags");
+
+	let chosen = [];
+
+	input.addEventListener("input", () => {
+		const query = input.value.trim().toLowerCase();
+		suggestions.innerHTML = "";
+
+		if (!query) return;
+
+		const matches = allTags.filter(t =>
+			t.toLowerCase().includes(query) && 
+			!chosen.includes(t)
+		);
+
+		matches.forEach(tag => {
+			const div = document.createElement("div");
+			div.textContent = tag;
+			div.classList.add("suggestion");
+			div.addEventListener("click", () => {
+				addTag(tag);
+				input.value = "";
+				suggestions.innerHTML = "";
+			});
+			suggestions.appendChild(div);
+		});
+	});
+
+
+	input.addEventListener("keydown", (e) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			const text = input.value.trim();
+			if (text && !chosen.includes(text)) {
+				addTag(text);
+				input.value = "";
+				suggestions.innerHTML = "";
+			}
+		}
+	});
+
+	function addTag(name) {
+		if (chosen.includes(name)) return; 
+
+		chosen.push(name);
+
+		const span = document.createElement("span");
+		span.textContent = name;
+		span.classList.add("tag");
+
+		const removeBtn = document.createElement("button");
+		removeBtn.textContent = "×";
+		removeBtn.type = "button";
+		removeBtn.addEventListener("click", () => {
+			chosen = chosen.filter(t => t !== name);
+			span.remove();
+			syncHidden();
+		});
+
+		span.appendChild(removeBtn);
+		selectedTags.appendChild(span);
+
+		syncHidden();
+	}
+
+	function syncHidden() {
+		hiddenTags.value = JSON.stringify(chosen);
+	}
+</script>
+

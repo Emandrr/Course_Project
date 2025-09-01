@@ -1,0 +1,169 @@
+﻿<div class="content">
+	<h3 class="elements-title">Custom Elements</h3>
+<div class="elements-sidebar">
+		<form method="post" asp-controller="inventory" asp-action="UpdateElems" enctype="multipart/form-data" id="customElemsForm">
+	<div id="customElemsContainer">
+		@for (int i = 0; i < ViewData.Model.inventory.CustomElems.Count; i++)
+		{
+			<div class="custom-elem-group" data-id="@i" draggable="true">
+				<input type="hidden" name="CustomElems.Index" value="@i" />
+				<div class="form-group">
+					<label>Element Name</label>
+					<input name="CustomElems[@i].Name" class="form-control" value="@ViewData.Model.inventory.CustomElems[i].Name" />
+				</div>
+				<div class="form-group">
+                            <label>Element Type</label>
+                            <div class="form-control" readonly>
+								@ViewData.Model.inventory.CustomElems[i].FieldType.ToString()
+                            </div>
+                </div>
+				<div class="checkbox-group">
+					<input type="checkbox" id="isVisible_@i" name="CustomElems[@i].IsVisible" checked="@ViewData.Model.inventory.CustomElems[i].IsVisible" />
+					<label for="isVisible_@i">Visible</label>
+				</div>
+			</div>
+		}
+	</div>
+	</form>
+</div>
+<button type="button" id="addElemsBtn" class="btn btn-primary">Add Element</button>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+	$(document).ready(function () {
+		let elemIndex = @ViewData.Model.inventory.CustomElems.Count;
+		let hasChanges = false;
+		let saveTimer = null;
+		const savedBadge = $('#savedBadge');
+		function updateSaveStatus(status) {
+			savedBadge.removeClass('saved unsaved saving');
+			switch(status) {
+				case 'saved':
+					savedBadge.addClass('saved').text('All changes saved');
+					break;
+				case 'unsaved':
+					savedBadge.addClass('unsaved').text('Not saved');
+					break;
+			}
+		}
+		function saveForm() {
+			if (!hasChanges) return;
+
+			updateSaveStatus('saving');
+
+			const formData = new FormData($('#customElemsForm')[0]);
+			formData.append('inventoryId', '@Model.inventory.PublicId');
+			$.ajax({
+				url: '/Inventory/UpdateElems',
+				type: 'POST',
+				data: formData,
+				processData: false,
+				contentType: false,
+				success: function(response) {
+					updateSaveStatus('saved');
+					hasChanges = false;
+				},
+				error: function(response){
+					updateSaveStatus('unsaved');
+				}
+			});
+		}
+		function startSaveTimer() {
+			if (saveTimer) {
+				clearTimeout(saveTimer);
+			}
+			saveTimer = setTimeout(saveForm, 5000);
+		}
+		$('#customElemsForm').on('input change', 'input, select', function() {
+			hasChanges = true;
+			updateSaveStatus('unsaved');
+			startSaveTimer();
+		});
+
+		$('#addElemsBtn').click(function () {
+			const newElemHtml = `
+				<div class="custom-elem-group" data-id="${elemIndex}" draggable="true">
+				<input type="hidden" name="CustomElems.Index" value="${elemIndex}" />
+					<div class="form-group">
+						<label>Element Name</label>
+						<input name="CustomElems[${elemIndex}].Name" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>Element Type</label>
+						<select name="CustomElems[${elemIndex}].FieldType" class="form-control">
+							<option value="SingleLine">Single Line Text</option>
+							<option value="MultiLine">Multiline Text</option>
+							<option value="Numeric">Number</option>
+							<option value="Checkbox">Boolean</option>
+							<option value="Link">Link</option>
+						</select>
+					</div>
+					<div class="checkbox-group">
+						<input type="checkbox" id="isVisible_${elemIndex}" name="CustomElems[${elemIndex}].IsVisible" />
+						<label for="isVisible_${elemIndex}">Visible</label>
+					</div>
+				</div>
+			`;
+			$('#customElemsContainer').append(newElemHtml);
+			elemIndex++;
+			hasChanges = true;
+			updateSaveStatus('unsaved');
+			startSaveTimer();
+
+			initDraggable();
+		});
+
+		const container = document.getElementById("customElemsContainer");
+		let dragged = null;
+
+		function initDraggable() {
+			Array.from(container.querySelectorAll(".custom-elem-group")).forEach(el => {
+				el.setAttribute("draggable", "true");
+			});
+		}
+		initDraggable();
+		container.addEventListener("dragstart", e => {
+			if (e.target.classList.contains("custom-elem-group")) {
+				dragged = e.target;
+				e.dataTransfer.effectAllowed = "move";
+			}
+		});
+		container.addEventListener("dragover", e => {
+			e.preventDefault();
+			const target = e.target.closest(".custom-elem-group");
+			if (target && target !== dragged) {
+				const rect = target.getBoundingClientRect();
+				const next = (e.clientY - rect.top) / (rect.height) > 0.5;
+				container.insertBefore(dragged, next ? target.nextSibling : target);
+			}
+		});
+		container.addEventListener("drop", e => {
+			e.preventDefault();
+			if (dragged) {
+				hasChanges = true;
+				updateSaveStatus('unsaved');
+				startSaveTimer();
+			}
+			dragged = null;
+		});
+		document.addEventListener("drop", e => {
+			if (dragged && !container.contains(e.target)) {
+				dragged.remove();
+				hasChanges = true;
+				updateSaveStatus('unsaved');
+				startSaveTimer();
+			}
+			dragged = null;
+		});
+		document.addEventListener("dragover", e => {
+			e.preventDefault();
+		});
+		$(window).on('beforeunload', function() {
+			if (hasChanges) {
+				saveForm();
+				return 'You have unsaved changes. Are you sure you want to leave?';
+			}
+		});
+	});
+</script>

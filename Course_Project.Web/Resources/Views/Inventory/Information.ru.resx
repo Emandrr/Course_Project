@@ -138,6 +138,9 @@
   <data name="Creation date" xml:space="preserve">
     <value>Дата создания</value>
   </data>
+  <data name="Enter comment" xml:space="preserve">
+    <value>Введите комментарий</value>
+  </data>
   <data name="Items" xml:space="preserve">
     <value>Айтемы</value>
   </data>
@@ -159,10 +162,10 @@
   <data name="Sign in for comment" xml:space="preserve">
     <value>Войдите для комментирования</value>
   </data>
-  <data name="Enter comment" xml:space="preserve">
-    <value>Введите комментарий</value>
-  </data>
   <data name="Edit" xml:space="preserve">
     <value>Изменить</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Категория</value>
   </data>
 </root>

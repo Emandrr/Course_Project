@@ -20,8 +20,8 @@
             <div class="item-meta">
                 <div class="item-creator">@Localizer["Created"]: @Model.Item.CreatorName</div>
             <div class="item-date">@Localizer["Created on"] Utc: @Model.Item.CreationDate.ToString("dd.MM.yyyy HH:mm:ss")</div>
+            <div class="item-cst-id">@Localizer["Custom Id"]: @Model.Item.CustomId</div>
             </div>
-
             <div class="item-actions">
                 <div class="like-section">
                     <span class="like-count">@Model.Item.Likes.Count()</span>

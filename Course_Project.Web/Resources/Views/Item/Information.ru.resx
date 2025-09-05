@@ -126,4 +126,7 @@
   <data name="Created on" xml:space="preserve">
     <value>Создано по</value>
   </data>
+  <data name="Custom id" xml:space="preserve">
+    <value>Кастомное айди</value>
+  </data>
 </root>

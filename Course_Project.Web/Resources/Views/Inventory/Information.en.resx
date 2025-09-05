@@ -138,6 +138,9 @@
   <data name="Creation date" xml:space="preserve">
     <value>Creation date</value>
   </data>
+  <data name="Enter comment" xml:space="preserve">
+    <value>Enter comment</value>
+  </data>
   <data name="Items" xml:space="preserve">
     <value>Items</value>
   </data>
@@ -159,10 +162,10 @@
   <data name="Sign in for comment" xml:space="preserve">
     <value>Sign in for comment</value>
   </data>
-  <data name="Enter comment" xml:space="preserve">
-    <value>Enter comment</value>
-  </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Category</value>
   </data>
 </root>

@@ -126,4 +126,7 @@
   <data name="Created on" xml:space="preserve">
     <value>Created on</value>
   </data>
+  <data name="Custom id" xml:space="preserve">
+    <value>Custom id</value>
+  </data>
 </root>

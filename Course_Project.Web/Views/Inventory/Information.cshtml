@@ -41,6 +41,7 @@
                         {
                             <p class="inventory-description-empty">@Localizer["(No description provided)"]</p>
                         }
+                        <h4>@Localizer["Category"] @Model.inventory.Category.Name</h4>
                         @if (User.Identity.IsAuthenticated && (Model.inventory.IsPublic || Model.inventory.User.UserName == User.Identity.Name ||
                                                 User.IsInRole("Admin") || Model.UserAccess.Contains(User.Identity.Name)))
                         {

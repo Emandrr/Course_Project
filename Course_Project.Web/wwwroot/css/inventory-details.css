@@ -4,9 +4,11 @@
     color: var(--bs-body-color);
     padding: 20px;
 }
+
 .row.mb-4 {
     align-items: flex-end;
 }
+
 .inventory-photo-card {
     background-color: var(--bs-card-bg);
     border: 1px solid var(--bs-card-border);
@@ -45,28 +47,9 @@
     margin-top: 1rem;
 }
 
-.inventory-edit-btn {
-    background-color: var(--bs-success);
-    color: #ffffff;
-    padding: 0.5rem 1rem;
-    text-decoration: none;
-    border-radius: 0.375rem;
-    border: 1px solid var(--bs-success);
-    transition: all 0.15s ease-in-out;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
+.btn-pr {
+    margin: 4px;
 }
-
-    .inventory-edit-btn:hover {
-        background-color: #157347;
-        border-color: #146c43;
-        color: #ffffff;
-        text-decoration: none;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
 
 .inventory-title {
     color: var(--bs-body-color);
@@ -168,6 +151,27 @@
         color: var(--bs-body-bg);
     }
 
+.inventory-info-tags-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.inventory-tags {
+    padding: 10px;
+    gap: 8px;
+}
+
+.tag-header {
+    background-color: var(--bs-card-bg);
+    border: 1px solid var(--bs-border-color);
+    padding: 0.3rem 0.8rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+}
+
 .action-btn-edit {
     color: #ffc107;
     border-color: #ffc107;
@@ -240,6 +244,127 @@
         text-decoration: none;
     }
 
+
+.comments-section h4 {
+    color: var(--bs-body-color);
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    padding: 0.75rem;
+}
+
+.comments-section .input-group {
+    margin-bottom: 1.5rem;
+}
+
+
+.comments-section #commentInput {
+    background-color: var(--bs-input-bg);
+    border: 2px solid var(--bs-border-color);
+    color: var(--bs-body-color);
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    border-radius: 8px 0 0 8px;
+}
+
+    .comments-section #commentInput:focus {
+        background-color: var(--bs-input-bg);
+        border-color: var(--bs-primary);
+        color: var(--bs-body-color);
+        outline: none;
+        box-shadow: none;
+    }
+
+    .comments-section #commentInput::placeholder {
+        color: var(--bs-body-color);
+        opacity: 0.6;
+        font-style: italic;
+    }
+
+
+.comments-section #sendBtn {
+    background-color: var(--bs-primary);
+    border: 2px solid var(--bs-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    border-radius: 0 8px 8px 0;
+}
+
+    .comments-section #sendBtn:disabled {
+        background-color: var(--bs-secondary);
+        border-color: var(--bs-secondary);
+        color: var(--bs-body-color);
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+
+.comments-section .input-group + p {
+    background-color: var(--bs-card-bg);
+    border: 2px solid var(--bs-border-color);
+    border-radius: 8px;
+    color: var(--bs-body-color);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 0.95rem;
+    font-style: italic;
+}
+
+
+.comments-section #comments {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+
+    .comments-section #comments li {
+        background-color: var(--bs-card-bg);
+        border: 2px solid var(--bs-border-color);
+        border-left: 4px solid var(--bs-primary);
+        color: var(--bs-body-color);
+        padding: 1rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--bs-body-color);
+    opacity: 0.8;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: var(--bs-primary);
+}
+
+.comment-date {
+    font-size: 1rem;
+    color: var(--bs-body-color);
+    opacity: 0.7;
+}
+
+.comment-text {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--bs-body-color);
+    margin: 0;
+}
+
 @media (max-width: 768px) {
     .inventory-container {
         padding: 10px;
@@ -263,6 +388,31 @@
     .inventory-edit-btn {
         padding: 0.375rem 0.75rem;
         font-size: 0.875rem;
+    }
+
+
+    .comments-section .input-group {
+        flex-direction: column;
+    }
+
+    .comments-section #commentInput {
+        border-radius: 8px 8px 0 0;
+        border-bottom: 1px solid var(--bs-border-color);
+    }
+
+    .comments-section #sendBtn {
+        border-radius: 0 0 8px 8px;
+        border-top: 1px solid var(--bs-primary);
+    }
+
+    .comments-section #comments li {
+        padding: 0.875rem 1rem;
+    }
+
+    .comment-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
     }
 }
 

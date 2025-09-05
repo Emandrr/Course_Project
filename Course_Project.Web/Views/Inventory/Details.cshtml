@@ -1,6 +1,5 @@
 ﻿@model InventoryEditViewModel
-<link rel="stylesheet" href="~/css/inventory.css" />
-<link rel="stylesheet" href="~/css/site.css" />
+<link rel="stylesheet" href="~/css/inventory-edit.css" />
 <div class="header">
     <h1>@Model.inventory.Title</h1>
     <span id="savedBadge" class="saved-badge saved">All changes saved</span>
@@ -9,15 +8,15 @@
     <i class="bi bi-arrow-left"></i>
 </button>
 <nav class="nav-tabs">
-    <button class="nav-tab active" onclick="showTab('items', this)">Items</button>
-    <button class="nav-tab" onclick="showTab('chat', this)">Chat</button>
+    <button class="nav-tab active" onclick="showTab('items', this)">@Localizer["Items"]</button>
+    <button class="nav-tab" onclick="showTab('chat', this)">@Localizer["Chat"]</button>
     @if (User.Identity.Name == Model.inventory.User.UserName || User.IsInRole("Admin"))
     {
-        <button class="nav-tab" onclick="showTab('settings', this)">Settings</button>
-        <button class="nav-tab" onclick="showTab('customid', this)">Custom ID</button>
-        <button class="nav-tab" onclick="showTab('fields', this)">Fields</button>
-        <button class="nav-tab" onclick="showTab('access', this)">Access</button>
-        <button class="nav-tab" onclick="showTab('stats', this)">Stats</button>
+        <button class="nav-tab" onclick="showTab('settings', this)">@Localizer["Settings"]</button>
+        <button class="nav-tab" onclick="showTab('customid', this)">@Localizer["Custom ID"]</button>
+        <button class="nav-tab" onclick="showTab('fields', this)">@Localizer["Fields"]</button>
+        <button class="nav-tab" onclick="showTab('access', this)">@Localizer["Access"]</button>
+        <button class="nav-tab" onclick="showTab('stats', this)">@Localizer["Stats"]</button>
     }
 </nav>
 <div id="tab-content">
@@ -45,21 +44,56 @@
     </div>
     }
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
 <script>
-    function showTab(tabName, button) {
-        const allTabs = document.querySelectorAll('.tab-panel');
-        allTabs.forEach(tab => {
-            tab.classList.remove('active');
-        });
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("@Url.Content("~/commentHub")")
+        .build();
 
-        const allButtons = document.querySelectorAll('.nav-tab');
-        allButtons.forEach(btn => {
-            btn.classList.remove('active');
+    const inventoryId = "@Model.inventory.PublicId";
+
+    connection.on("ReceiveComment", (comment) => {
+        const tbody = document.querySelector("#chat-tab table tbody");
+        if (!tbody) return;
+
+        const tr = document.createElement("tr");
+        tr.setAttribute("data-id", comment.id);
+        tr.innerHTML = `
+            <td><input type="checkbox" class="checkboxtable" id="${comment.id}" value="${comment.id}" /></td>
+            <td>${comment.authorName}</td>
+            <td>${comment.description}</td>
+            <td>${comment.createdDate || new Date().toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    connection.on("RemoveComments", (invId, commentIds) => {
+        if (invId !== inventoryId) return;
+        commentIds.forEach(id => {
+            const row = document.querySelector(`#chat-tab tr[data-id='${id}']`);
+            if (row) row.remove();
         });
-        const selectedTab = document.getElementById(tabName + '-tab');
-        if (selectedTab) {
-            selectedTab.classList.add('active');
+    });
+
+    connection.start().catch(err => console.error(err));
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const selectDeselect = document.querySelector("#chat-tab #selectDeselect");
+        if(selectDeselect){
+            selectDeselect.addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll("#chat-tab .checkboxtable");
+                checkboxes.forEach(cb => cb.checked = this.checked);
+            });
         }
-        button.classList.add('active');
+    });
+
+    function deleteSelectedComments() {
+        const selected = Array.from(document.querySelectorAll("#chat-tab .checkboxtable:checked"))
+            .map(cb => cb.value);
+        if(selected.length === 0) return;
+
+        connection.invoke("DeleteComments", inventoryId, selected)
+            .catch(err => console.error(err));
     }
+
 </script>

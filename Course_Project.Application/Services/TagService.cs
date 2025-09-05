@@ -40,7 +40,7 @@ namespace Course_Project.Application.Services
         public async Task TryAddTagsToInventory(string GuidId, List<string> ProbablyNewTags)
         {
             await InsertNewTagsAsync(ProbablyNewTags);
-            Inventory inv = await _inventoryService.GetInventoryAsNoTrackingAsync(GuidId);
+            Inventory inv = await _inventoryService.GetInventoryAsync(GuidId);
             if (inv != null) await AddTagsToInventoryAsync(inv.Id, ProbablyNewTags,GuidId);
 
         }
@@ -57,7 +57,7 @@ namespace Course_Project.Application.Services
         }
         public async Task TryDeleteTagsToInvenotory(string GuidId)
         {
-            Inventory inv = await _inventoryService.GetInventoryAsNoTrackingAsync(GuidId);
+            Inventory inv = await _inventoryService.GetInventoryAsync(GuidId);
             if (inv != null) await _tagRepository.DeleteInventoryTagsAsync(inv.InventoryTags);
         }
     }

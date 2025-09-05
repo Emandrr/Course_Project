@@ -1,0 +1,90 @@
+﻿
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--color-input-border);
+    border-radius: 4px;
+    background-color: var(--color-input-bg);
+    color: var(--color-text);
+}
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+.btn {
+    padding: 8px 16px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #fff;
+    background-color: var(--color-primary);
+    transition: background-color 0.3s;
+}
+
+    .btn:hover {
+        background-color: darken(var(--color-primary), 10%);
+    }
+
+
+.current-photo {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+}
+
+.selected-tags {
+    margin-top: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.tag {
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: grab;
+    display: inline-flex;
+    align-items: center;
+}
+
+    .tag:hover {
+        opacity: 0.8;
+    }
+
+.suggestions {
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: var(--color-input-bg);
+    margin-top: 2px;
+    position: absolute;
+    z-index: 1000;
+}
+
+.suggestion {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+    .suggestion:hover {
+        background-color: var(--color-primary);
+        color: #fff;
+    }

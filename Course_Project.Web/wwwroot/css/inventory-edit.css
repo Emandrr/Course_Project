@@ -1,0 +1,215 @@
+﻿[data-bs-theme="light"] {
+    --color-text: #212529;
+    --color-bg: #ffffff;
+    --color-border: #dee2e6;
+    --color-input-bg: #ffffff;
+    --color-input-border: #ced4da;
+    --color-primary: #0d6efd;
+    --color-card-bg: #ffffff;
+}
+
+[data-bs-theme="dark"] {
+    --color-text: #adb5bd;
+    --color-bg: #212529;
+    --color-border: #495057;
+    --color-input-bg: #2b3035;
+    --color-input-border: #495057;
+    --color-primary: #0d6efd;
+    --color-card-bg: #2b3035;
+}
+.tab-panel {
+    display: none;
+}
+
+    .tab-panel.active {
+        display: block;
+    }
+.btn-ed {
+    margin: 10px;
+}
+.tag,
+.tag-header {
+    background-color: var(--bs-card-bg);
+    border: 1px solid var(--bs-border-color);
+    padding: 0.3rem 0.8rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    display: inline-block;
+    cursor: default;
+}
+
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+
+    .selected-tags .tag[draggable="true"] {
+        cursor: grab;
+    }
+
+        .selected-tags .tag[draggable="true"]:active {
+            cursor: grabbing;
+        }
+    
+.suggestions {
+    margin-top: 5px;
+    border: 1px solid var(--bs-border-color);
+    background-color: var(--bs-card-bg);
+    border-radius: 0.375rem;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+    position: absolute;
+    width: 100%;
+}
+
+    .suggestions div {
+        padding: 0.5rem;
+        cursor: pointer;
+    }
+
+        .suggestions div:hover {
+            background-color: var(--bs-border-color);
+        }
+
+* {
+    box-sizing: border-box;
+}
+
+.project-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.content-container {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    padding-block-end: 5%;
+}
+
+.main-form {
+    flex: 0 0 500px;
+    min-width: 0;
+}
+
+.inventory-edit-container, .id-sidebar, .elements-sidebar {
+    flex: 1;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 8px;
+    padding: 0 20px 20px 20px;
+    height: 53vh;
+    margin: 20px 0 5vh 0;
+    overflow-y: auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--bs-body-color);
+}
+
+input[type="text"], input[type="file"], select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background-color: var(--bs-input-bg);
+    color: var(--bs-body-color);
+    font-size: 14px;
+}
+
+    input[type="text"]:focus, select:focus {
+        outline: none;
+        border-color: var(--bs-input-focus-border);
+        box-shadow: var(--bs-input-focus-shadow);
+    }
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+    .btn:hover {
+        text-decoration: none;
+    }
+#customIdsValContainer {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.id-wrapper .form-control {
+    border: none !important;
+    padding: 0;
+    margin: 0;
+}
+
+
+.id-wrapper:last-child .utf-preview {
+    position: relative;
+    display: inline-block;
+}
+
+    .id-wrapper:last-child .utf-preview::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 1ch;
+        height: 100%;
+        background: var(--bs-body-bg);
+        pointer-events: none;
+    }
+
+.id-sidebar {
+    flex: 1;
+    border: 1px solid;
+    border-color: var( --bs-border-color);
+    border-radius: 8px;
+    padding-right: 20px;
+    padding-left: 20px;
+    padding-bottom: 20px;
+    height: 53vh;
+    margin-block-end: 5vh;
+    margin-block-start: 20px;
+    overflow-y: auto;
+}
+.custom-id-group {
+    flex:1;
+}
+.utf-preview{
+    font-size:1.5rem;
+}
+.custom-id-group,
+.custom-elem-group {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: var(--bs-input-bg);
+    cursor: move;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.checkbox-group{
+    display:contents;
+}
+label {
+    margin-bottom: 0px;
+}

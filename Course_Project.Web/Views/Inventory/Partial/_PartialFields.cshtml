@@ -1,5 +1,5 @@
 ﻿<div class="content">
-	<h3 class="elements-title">Custom Elements</h3>
+	<h3 class="elements-title">@Localizer["Custom elements"]</h3>
 <div class="elements-sidebar">
 		<form method="post" asp-controller="inventory" asp-action="UpdateElems" enctype="multipart/form-data" id="customElemsForm">
 	<div id="customElemsContainer">
@@ -8,25 +8,41 @@
 			<div class="custom-elem-group" data-id="@i" draggable="true">
 				<input type="hidden" name="CustomElems.Index" value="@i" />
 				<div class="form-group">
-					<label>Element Name</label>
+					<label>@Localizer["Element name"]</label>
 					<input name="CustomElems[@i].Name" class="form-control" value="@ViewData.Model.inventory.CustomElems[i].Name" />
 				</div>
 				<div class="form-group">
-                            <label>Element Type</label>
+					<label>@Localizer["Description"]</label>
+					<input name="CustomElems[@i].Description" class="form-control" />
+				</div>
+				<div class="form-group">
+                            <label>@Localizer["Element type"]</label>
                             <div class="form-control" readonly>
-								@ViewData.Model.inventory.CustomElems[i].FieldType.ToString()
+								@{
+									var fieldType = ViewData.Model.inventory.CustomElems[i].FieldType.ToString();
+									string displayText = fieldType switch
+									{
+										"SingleLine" => Localizer["Single line text"].Value,
+										"MultiLine" => Localizer["Multiline text"].Value,
+										"Numeric" => Localizer["Number"].Value,
+										"Checkbox" => Localizer["Boolean"].Value,
+										"Link" => Localizer["Link"].Value,
+										_ => fieldType
+									};
+								}
+								@displayText
                             </div>
                 </div>
 				<div class="checkbox-group">
 					<input type="checkbox" id="isVisible_@i" name="CustomElems[@i].IsVisible" checked="@ViewData.Model.inventory.CustomElems[i].IsVisible" />
-					<label for="isVisible_@i">Visible</label>
+					<label for="isVisible_@i">@Localizer["Visible"]</label>
 				</div>
 			</div>
 		}
 	</div>
 	</form>
 </div>
-<button type="button" id="addElemsBtn" class="btn btn-primary">Add Element</button>
+<button type="button" id="addElemsBtn" class="btn btn-primary">@Localizer["Add element"]</button>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
@@ -80,31 +96,50 @@
 			updateSaveStatus('unsaved');
 			startSaveTimer();
 		});
+		const localizerElems = {
+			elementName: "@Localizer["Element name"]",
+			description: "@Localizer["Description"]",
+			elementType: "@Localizer["Element type"]",
+			singleLine: "@Localizer["Single line text"]",
+			multiLine: "@Localizer["Multiline text"]",
+			numeric: "@Localizer["Number"]",
+			checkbox: "@Localizer["Boolean"]",
+			link: "@Localizer["Link"]",
+			visible: "@Localizer["Visible"]"
+		};
 
 		$('#addElemsBtn').click(function () {
 			const newElemHtml = `
 				<div class="custom-elem-group" data-id="${elemIndex}" draggable="true">
-				<input type="hidden" name="CustomElems.Index" value="${elemIndex}" />
+					<input type="hidden" name="CustomElems.Index" value="${elemIndex}" />
 					<div class="form-group">
-						<label>Element Name</label>
+						<label>${localizerElems.elementName}</label>
 						<input name="CustomElems[${elemIndex}].Name" class="form-control" />
 					</div>
 					<div class="form-group">
-						<label>Element Type</label>
+						<label>${localizerElems.description}</label>
+						<input name="CustomElems[${elemIndex}].Description" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>${localizerElems.elementType}</label>
 						<select name="CustomElems[${elemIndex}].FieldType" class="form-control">
-							<option value="SingleLine">Single Line Text</option>
-							<option value="MultiLine">Multiline Text</option>
-							<option value="Numeric">Number</option>
-							<option value="Checkbox">Boolean</option>
-							<option value="Link">Link</option>
+							<option value="SingleLine">${localizerElems.singleLine}</option>
+							<option value="MultiLine">${localizerElems.multiLine}</option>
+							<option value="Numeric">${localizerElems.numeric}</option>
+							<option value="Checkbox">${localizerElems.checkbox}</option>
+							<option value="Link">${localizerElems.link}</option>
 						</select>
 					</div>
 					<div class="checkbox-group">
 						<input type="checkbox" id="isVisible_${elemIndex}" name="CustomElems[${elemIndex}].IsVisible" />
-						<label for="isVisible_${elemIndex}">Visible</label>
+						<label for="isVisible_${elemIndex}">${localizerElems.visible}</label>
 					</div>
 				</div>
 			`;
+			$('#customElemsContainer').append(newElemHtml);
+			elemIndex++;
+		});
+
 			$('#customElemsContainer').append(newElemHtml);
 			elemIndex++;
 			hasChanges = true;

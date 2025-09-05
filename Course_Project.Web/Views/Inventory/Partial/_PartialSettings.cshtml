@@ -1,40 +1,41 @@
 ﻿<form method="post" enctype="multipart/form-data">
+<link rel="stylesheet" href="~/css/settings.css" />
 <div class="inventory-edit-container">
 
         <input type="hidden" name="id" value="@Model.inventory.PublicId" />
 
         <div class="form-group">
-            <label for="Title" class="form-label">Название инвентаря</label>
-            <input name="Title" id="inventory_Title" value="@Model.inventory.Title" class="form-control" placeholder="Введите название инвентаря" required />
+            <label for="Title" class="form-label">@Localizer["Inventory name"]</label>
+            <input name="Title" id="inventory_Title" value="@Model.inventory.Title" class="form-control" placeholder="@Localizer["Write inventory name"]" required />
             <span class="text-danger field-validation-valid" data-valmsg-for="inventory.Title" data-valmsg-replace="true"></span>
         </div>
 
         <div class="form-group">
-            <label for="Description" class="form-label">Описание</label>
-            <textarea name="Description" id="inventory_Description" class="form-control" rows="4" placeholder="Введите описание инвентаря">@Model.inventory.Description</textarea>
+            <label for="Description" class="form-label">@Localizer["Description"]</label>
+            <textarea name="Description" id="inventory_Description" class="form-control" rows="4" placeholder="@Localizer["Write inventory description"]">@Model.inventory.Description</textarea>
             <span class="text-danger field-validation-valid" data-valmsg-for="inventory.Description" data-valmsg-replace="true"></span>
         </div>
 
         <div class="form-group">
-            <label class="form-label">Текущее фото</label>
+            <label class="form-label">@Localizer["Current photo"]</label>
             @if (!string.IsNullOrEmpty(Model.Photo))
             {
                 <div class="current-photo-container mb-3">
-                    <img src="@Model.Photo" alt="Текущее фото" class="current-photo img-thumbnail" style="max-width: 200px; max-height: 200px;" />
+                    <img src="@Model.Photo" alt=">@Localizer["Current photo"]" class="current-photo img-thumbnail" style="max-width: 200px; max-height: 200px;" />
                 </div>
             }
             else
             {
                 <div class="no-photo-placeholder mb-3">
-                    <span class="text-muted">Фото не загружено</span>
+                    <span class="text-muted">>@Localizer["No photo"]</span>
                 </div>
             }
         </div>
 
         <div class="form-group">
-            <label for="imageFile" class="form-label">Загрузить новое фото</label>
+            <label for="imageFile" class="form-label">@Localizer["Upload new photo"]</label>
             <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*" />
-            <small class="form-text text-muted">Поддерживаемые форматы: JPG, PNG. Максимальный размер: 5MB</small>
+            <small class="form-text text-muted">@Localizer["Supported formats IMG,JPG JPEG Max value"] 5MB</small>
         </div>
         <div class="form-group">
             <label for="SelectedCategoryId" class="control-label"></label>
@@ -50,15 +51,12 @@
         </div>
         <div class="form-group">
             <label for="tagInput">Tags</label>
-            <input type="text" id="tagInput" placeholder="Начни вводить тег" class="form-control" />
+            <input type="text" id="tagInput" placeholder="@Localizer["Start writing tag"]" class="form-control" />
             <div id="suggestions" class="suggestions"></div>
             <div id="selectedTags" class="selected-tags">
                 @foreach (var tag in Model.InvTags)
                 {
-                    <span class="tag">
-                        @tag
-                        <button type="button" class="remove-tag">×</button>
-                    </span>
+                    <span class="tag" draggable="true">@tag</span>
                 }
             </div>
             <input type="hidden" name="InvTags" id="hiddenTags"
@@ -67,12 +65,11 @@
         </div>
 
 </div>
-
-<button type="submit" class="btn btn-sm btn-danger" asp-action="Save" asp-controller="Inventory" >
-    <i class="fas fa-ban me-1"></i>Save
+<button type="submit" class="btn" asp-action="Save" asp-controller="Inventory" >
+    <i class="fas fa-ban me-1"></i>@Localizer["Save"]
 </button>
-<button type="submit" class="btn btn-sm btn-success" asp-action="Delete" asp-controller="Inventory" >
-    <i class="fas fa-unlock-alt me-1"></i>Delete
+<button type="submit" class="btn" asp-action="Delete" asp-controller="Inventory" >
+    <i class="fas fa-unlock-alt me-1"></i>@Localizer["Delete"]
 </button>
 </form>
 <script>
@@ -123,22 +120,13 @@
 
         function addTag(name) {
             if (chosen.includes(name)) return;
-
             chosen.push(name);
 
             const $span = $("<span>").addClass("tag").text(name);
-            const $removeBtn = $("<button>").attr("type", "button").addClass("remove-tag").text("×");
-
-            $removeBtn.click(function () {
-                chosen = chosen.filter(t => t !== name);
-                $span.remove();
-                syncHidden();
-            });
-
-            $span.append($removeBtn);
             $selectedTags.append($span);
 
             syncHidden();
+
         }
 
 
@@ -175,7 +163,19 @@
             }
         });
 
+            $selectedTags.find(".tag").each(function () {
+        const tagName = $(this).text().trim();
+        chosen.push(tagName);
 
+        $(this).on("dragend", function () {
+            const index = chosen.indexOf(tagName);
+            if (index !== -1) {
+                chosen.splice(index, 1); 
+                $(this).remove();        
+                syncHidden();
+            }
+        });
+    });
         syncHidden();
     });
 

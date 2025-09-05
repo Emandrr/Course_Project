@@ -23,6 +23,7 @@ namespace Course_Project.Domain.Models.InventoryModels
         public List<CustomFieldOption> CustomElems { get; set; } = new List<CustomFieldOption>();
         public List<UserInventoryAccess> UserAccesses { get; set; } = new List<UserInventoryAccess>();
         public List<InventoryTag> InventoryTags { get; set; } = new List<InventoryTag>();
+        public List<Comment> Comments { get; set; } = new List<Comment> { };
         public DateTime CreationDate { get; set; }
         public int CategoryId { get; set; }
         public Category Category { get; set; }

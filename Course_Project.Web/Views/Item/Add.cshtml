@@ -1,11 +1,11 @@
 ﻿@model Course_Project.Web.ViewModels.ItemAddViewModel
 
 <link href="~/css/item-add.css" rel="stylesheet" />
-<h2>Add Item</h2>
+<h2>@Localizer["Add Item"]</h2>
 
 <form asp-action="Add" method="post" enctype="multipart/form-data">
     <div class="form-group">
-        <label asp-for="Name"></label>
+        <label asp-for="Name">@Localizer["Name"]</label>
         <input asp-for="Name" class="form-control" />
     </div>
     <div class = "setofid" id="customIdsValContainer">
@@ -15,47 +15,47 @@
                 {
                     case IdType.Text:
                         {
-                            <pre class="utf-preview">Single line(5 symbols)@field.Rule</pre>
+                            <pre class="utf-preview">@Localizer["Single line(5 symbols)"]@field.Rule</pre>
                             break;
                         }
                     case IdType.Rand32Bit:
                         {
-                            <pre class="utf-preview">(10 digits format 32 bit Integer with @field.Rule)-</pre>
+                        <pre class="utf-preview">@Localizer["(10 digits format 32 bit Integer with"] @field.Rule-</pre>
                             break;
                         }
                     case IdType.Rand20Bit:
                         {
-                            <pre class="utf-preview">(8 digits format 20 bit Integer with @field.Rule)-</pre>
+                        <pre class="utf-preview">@Localizer["(8 digits format 20 bit Integer with"] @field.Rule)-</pre>
                             break;
                         }
                     case IdType.Rand9Digit:
                         {
-                            <pre class="utf-preview">(9 digit Integer)@field.Rule</pre>
+                        <pre class="utf-preview">@Localizer["(9 digit Integer)"]@field.Rule</pre>
                             break;
                         }
                     case IdType.Rand6Digit:
                         {
-                            <pre class="utf-preview">(6 digit Integer)@field.Rule</pre>
+                        <pre class="utf-preview">@Localizer["(6 digit Integer)"]@field.Rule</pre>
                             break;
                         }
                     case IdType.GUID:
                         {
-                            <pre class="utf-preview">(Guid)@field.Rule</pre>
+                        <pre class="utf-preview">@Localizer["(Guid)"]@field.Rule</pre>
                             break;
                         }
                     case IdType.DateTime:
                         {
-                            <pre class="utf-preview">(Date with value)@field.Rule-</pre>
+                        <pre class="utf-preview">@Localizer["(Date with value)"] @field.Rule-</pre>
                             break;
                         }
                     case IdType.Sequence:
                         {
-                            <pre class="utf-preview">(Amount of items in inventory)@field.Rule</pre>
+                        <pre class="utf-preview">@Localizer["(Amount of items in inventory)"] @field.Rule</pre>
                             break;
                         }
                     default:
                         {
-                        <pre class="utf-preview">Single line(5 symbols) @field.Rule</pre>
+                        <pre class="utf-preview">@Localizer["Single line(5 symbols)"]@field.Rule</pre>
                         break;
                         }
                 }
@@ -64,14 +64,14 @@
     @if (Model.Inventory.CustomSetOfIds.Count > 0)
     {
         <div class="form-group">
-            <label asp-for="CustomIdString"></label>
+            <label asp-for="CustomIdString">@Localizer["Custom id"]</label>
             <input asp-for="CustomIdString" class="form-control" />
         </div>
     }
     <input type="hidden" name="CreatorName" value="@User.Identity.Name" />
     <input type="hidden" name="InvId" value="@Model.Inventory.PublicId" />
     @if(Model.Inventory.CustomElems.Count>0){
-    <h4>Custom Fields</h4>
+    <h4>@Localizer["Custom Fields"]</h4>
     }
     @for (int i = 0; i < Model.Inventory.CustomElems.Count; i++)
     {
@@ -81,6 +81,7 @@
                 <label>@field.Name</label>
             <input type="hidden" name="CustomFields[@i].FieldType" value="@field.FieldType" />
             <input type="hidden" name="CustomFields[@i].IsVisible" value="@( (field.IsVisible ?? false).ToString().ToLower() )" />
+            <label>@field.Description</label>
                 @switch (field.FieldType)
                 {
                     case CustomFieldType.SingleLine:
@@ -117,12 +118,12 @@
             </div>
     }
     <div class="form-group">
-        <label for="ImageFile">Выберите фотографию</label>
+        <label for="ImageFile">@Localizer["Choose photo"]</label>
         <input name="ImageFile" id="ImageFile" type="file" class="form-control-file" accept="image/*">
         <span class="text-danger"></span>
     </div>
     <div id="imagePreview" class="mt-3"></div>
-    <button id="submitBtn" type="submit" class="btn btn-primary">Add</button>
+    <button id="submitBtn" type="submit" class="btn btn-primary">@Localizer["Add"]</button>
 </form>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>

@@ -24,7 +24,12 @@ namespace Course_Project.DataAccess.Interfaces
         public Task DeleteAsync(Inventory inventory);
         public Task<List<Inventory>> GetInventoryAccessByIdAsync(string UserId);
         public Task<List<Inventory>> TryGetByNameAsync(string Name);
+        public Task<List<Inventory>> TryGetByTagAsync(string Tag);
         public Task<Inventory?> GetInventoryByIdAsNoTrackingAsync(Guid id);
+        public Task<List<Inventory>> GetRecentAsync(int count);
+        public Task<List<Inventory>> GetTopByItemsAsync(int count);
+        public Task<List<Inventory>> GetInventoryOnGuidsAsync(List<Guid> ids);
+        public Task DeleteItemsAsync(List<Inventory> invs);
 
     }
 }

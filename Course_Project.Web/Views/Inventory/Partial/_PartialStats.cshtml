@@ -1,1 +1,49 @@
-﻿
+﻿@model Course_Project.Web.ViewModels.InventoryEditViewModel
+<link rel="stylesheet" href="~/css/stats.css" />
+<div class="inventory-stats-card">
+    <h4>Inventory Statistics</h4>
+
+    <p><strong>@Localizer["Total Items"]:</strong> @Model.inventory.Items.Count</p>
+
+    @{
+        var mostLikedItem = Model.inventory.Items.OrderByDescending(i => i.Likes.Count).FirstOrDefault();
+        var newestItem = Model.inventory.Items.OrderByDescending(i => i.CreationDate).FirstOrDefault();
+        var itemsByDate = Model.inventory.Items
+        .GroupBy(i => i.CreationDate.Date)
+        .OrderBy(g => g.Key)
+        .ToList();
+    }
+
+    @if (mostLikedItem != null)
+    {
+        <p><strong>@Localizer["Most Popular Item"]:</strong> @mostLikedItem.Name (@Localizer["Likes"]: @mostLikedItem.Likes.Count)</p>
+    }
+    else
+    {
+        <p><strong>@Localizer["Most Popular Item"]:</strong> @Localizer["No items"]</p>
+    }
+
+    @if (newestItem != null)
+    {
+        <p><strong>@Localizer["Newest item"]:</strong> @newestItem.Name (@Localizer["Created"]: @newestItem.CreationDate.ToString("dd.MM.yyyy"))</p>
+    }
+    else
+    {
+        <p><strong>@Localizer["Newest item"]:</strong> @Localizer["No items"]</p>
+    }
+
+    <h5>@Localizer["Items Count by Date"]</h5>
+    @if (itemsByDate.Any())
+    {
+        <ul>
+            @foreach (var group in itemsByDate)
+            {
+                <li>@group.Key.ToString("dd.MM.yyyy"): @group.Count() item(s)</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>@Localizer["No items"].</p>
+    }
+</div>

@@ -9,8 +9,8 @@ namespace Course_Project.Web.ViewModels
         public CustomFieldType FieldType { get; set; }
         public bool IsVisible { get;set; }
         public string? Value { get; set; }
-        public int? NumericValue { get; set; }
-        public bool? BoolValue { get; set; }
+        public int? NumericValue { get; set; } = 0;
+        public bool? BoolValue { get; set; } = false;
         public Uri? UrlValue { get; set; }
 
     }

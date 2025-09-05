@@ -28,21 +28,21 @@
             <h1 class="login-title">@Localizer["Login"]</h1>
             <form method="post" asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl">
                 <div class="form-group">
-                    <label asp-for="Email">Email</label>
-                    <input asp-for="Email" type="email" autocomplete="username" placeholder="Enter email" />
+                    <label asp-for="Email">@Localizer["Email"]</label>
+                    <input asp-for="Email" type="email" autocomplete="username" placeholder="@Localizer["Enter email"]" />
                     <div asp-validation-for="Email" class="validation-message"></div>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="Password">Password</label>
-                    <input asp-for="Password" type="password" autocomplete="current-password" placeholder="Password" />
+                    <label asp-for="Password">@Localizer["Password"]</label>
+                    <input asp-for="Password" type="password" autocomplete="current-password" placeholder="@Localizer["Password"]" />
                     <div asp-validation-for="Password" class="validation-message"></div>
                 </div>
 
-                <button type="submit" class="login-button">Login</button>
+                <button type="submit" class="login-button">@Localizer["Login"]</button>
 
                 <p class="register-link">
-                    No account? <a asp-controller="Auth" asp-action="Register">Sign up</a>
+                    @Localizer["No account"]? <a asp-controller="Auth" asp-action="Register">@Localizer["Sign up"]</a>
                 </p>
             </form>
             <div class="soc-links">

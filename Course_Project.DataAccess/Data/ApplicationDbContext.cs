@@ -94,8 +94,13 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .WithMany(i => i.Likes)
             .HasForeignKey(c => c.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-
-
+        modelBuilder.Entity<Comment>()
+            .HasOne(c => c.Inventory)
+            .WithMany(i => i.Comments)
+            .HasForeignKey(c => c.InventoryId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<Item>()
+        .HasIndex(u => u.CustomIdWithInventoryId).IsUnique();
         modelBuilder.Entity<CustomField>()
             .HasDiscriminator<string>("CustomField")
             .HasValue<CheckboxField>("CheckboxField")
@@ -118,4 +123,5 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Like> Likes { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Tag> Tags { get; set; }
+    public DbSet<Comment> Comments { get; set; }
 }

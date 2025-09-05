@@ -1,14 +1,120 @@
-﻿.cont {
-    display: flex;
-    width: 100%;
+﻿
+body {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    font-family: system-ui, sans-serif;
+    margin: 0;
+    padding: 0;
 }
+
+
+.user-info-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+.tab-panel{
+    padding-block-start: 10px;
+}
+
+.inventory-photo-card img.inventory-photo {
+    max-width: 250px;
+    border-radius: 0.5rem;
+    border: 1px solid var(--bs-border-color);
+    display: block;
+}
+
+.inventory-photo-placeholder {
+    width: 250px;
+    height: 250px;
+    background-color: var(--bs-card-bg);
+    border: 1px dashed var(--bs-border-color);
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bs-body-color);
+}
+
 
 .user-info {
-    flex: 0 0 20%;
-    padding-right: 10px; 
+    flex: 1;
+    min-width: 250px;
 }
 
-.cont {
-    flex: 0 0 80%;
-    padding-left: 10px; 
+    .user-info h1 {
+        font-size: 1.25rem;
+        margin: 0.25rem 0;
+    }
+
+.user-table-container {
+    width: 100%;
+    overflow-x: auto; 
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+    .user-table th,
+    .user-table td {
+        padding: 0.5rem;
+        border: 1px solid var(--bs-border-color);
+    }
+
+    .user-table th {
+        background-color: var(--bs-card-bg);
+        font-weight: 600;
+    }
+
+.tab-nav {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+    border-bottom: 1px solid var(--bs-border-color);
+    flex-wrap: wrap;
+}
+
+.tab-item {
+    margin-right: 1rem;
+}
+
+.tab-link {
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    color: var(--bs-body-color);
+    display: inline-block;
+}
+
+    .tab-link.active {
+        border-bottom: 2px solid var(--bs-btn-bg);
+        font-weight: 600;
+    }
+
+
+@media (max-width: 768px) {
+    .user-info-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .inventory-photo-card img.inventory-photo,
+    .inventory-photo-placeholder {
+        max-width: 200px;
+        height: auto;
+    }
+
+    .user-info {
+        margin-top: 1rem;
+    }
+
+        .user-info h1 {
+            font-size: 1.1rem;
+        }
 }

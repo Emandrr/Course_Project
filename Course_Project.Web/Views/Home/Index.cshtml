@@ -1,8 +1,125 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+﻿@model HomeViewModel
+<div class="tag-search-form-wrapper">
+    <div class="tag-search-form">
+        <div class="search-container">
+            <input type="text" id="tagInput" class="search-input" placeholder="@Localizer["Input tag"]..." autocomplete="off" />
+            <button id="searchBtn" type="button" class="search-btn">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+        <div id="suggestions" class="suggestions"></div>
+    </div>
 </div>
+<div class="inv-table">
+<p class="inventory-created">
+    @Localizer["Popular inventories"]
+</p>
+<table class="table table-striped table-bordered user-table">
+    <thead>
+        <tr>
+            <th scope="col">@Localizer["Public Id"]</th>
+            <th scope="col">@Localizer["Title"]</th>
+            <th scope="col">@Localizer["Creation date"]</th>
+            <th scope="col">@Localizer["Items"]</th>
+            <th scope="col">@Localizer["Creator"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var inv in Model.TopByItemsInventories)
+        {
+            <tr data-id="@inv.PublicId">
+                <td>@inv.PublicId</td>
+                <td>@inv.Title</td>
+                <td>@inv.CreationDate</td>
+                <td>@inv.Items.Count()</td>
+                <td>@inv.User.Login</td>
+            </tr>
+        }
+    </tbody>
+</table>
+</div>
+<div class="inv-table">
+<p class="inventory-created">
+    @Localizer["Latest inventories"]
+</p>
+<table class="table table-striped table-bordered user-table">
+    <thead>
+        <tr>
+            <th scope="col">@Localizer["Public Id"]</th>
+            <th scope="col">@Localizer["Title"]</th>
+            <th scope="col">@Localizer["Creation date"]</th>
+            <th scope="col">@Localizer["Items"]</th>
+            <th scope="col">@Localizer["Creator"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var inv in Model.RecentInventories)
+        {
+            <tr data-id="@inv.PublicId">
+                <td>@inv.PublicId</td>
+                <td>@inv.Title</td>
+                <td>@inv.CreationDate</td>
+                <td>@inv.Items.Count()</td>
+                <td>@inv.User.Login</td>
+            </tr>
+        }
+    </tbody>
+</table>
+</div>
+<script>
+    $(document).ready(function () {
+        $('tbody').on('click', 'tr', function () {
+            const inv = $(this).data('id');
+            window.location.href = '/Inventory/Information/' + inv;
+        });
+        const $input = $("#tagInput");
+        const $suggestions = $("#suggestions");
+        const allTags = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AllTags));
+
+        let selectedTag = null;
+
+        $input.on("input", function () {
+            const query = $(this).val().trim().toLowerCase();
+            $suggestions.empty();
+            if (!query) return;
+
+            const matches = allTags.filter(t =>
+                t.toLowerCase().includes(query)
+            );
+
+            matches.forEach(tag => {
+                const $div = $("<div>").addClass("suggestion").text(tag);
+                $div.click(function () {
+                    selectedTag = tag;
+                    $input.val(tag);
+                    $suggestions.empty();
+                });
+                $suggestions.append($div);
+            });
+        });
+
+
+        $input.on("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                if ($suggestions.children().length > 0) {
+                    const tag = $suggestions.children().first().text();
+                    selectedTag = tag;
+                    $input.val(tag);
+                    $suggestions.empty();
+                }
+            }
+        });
+
+        $("#searchBtn").click(function () {
+            const tag = $input.val().trim();
+            if (!tag) {
+                alert("Введите тег");
+                return;
+            }
+
+            window.location.href = "/Inventory/SearchByTag?tag=" + encodeURIComponent(tag);
+        });
+    });
+</script>
+

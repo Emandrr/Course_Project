@@ -16,5 +16,9 @@ namespace Course_Project.DataAccess.Interfaces
         public Task<Item?> GetItemByIdAsNoTrackingAsync(Guid id);
         public Task<Item?> GetItemByIdAsync(Guid id);
         public Task<List<string>> GetUserLikesAsync(Guid id);
+        public Task<Item?> GetItemByCustomIdAsync(string customid);
+        public Task<List<Item>> GetItemOnGuidsAsync(List<Guid> ids);
+        public Task DeleteItemAsync(Item item);
+        public Task DeleteItemsAsync(List<Item> items);
     }
 }

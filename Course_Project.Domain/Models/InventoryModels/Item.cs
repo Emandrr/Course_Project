@@ -16,6 +16,7 @@ namespace Course_Project.Domain.Models.InventoryModels
         public DateTime CreationDate { get; set; }
         public string CreatorName { get; set; }
         public string CustomId { get; set; }
+        public string CustomIdWithInventoryId { get; set; }
         public List<CustomField> CustomFields { get;set; } = new List<CustomField>();
         public int InventoryId { get; set; }
         public Inventory? Inventory { get; set; }

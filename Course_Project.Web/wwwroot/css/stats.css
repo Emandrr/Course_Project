@@ -1,0 +1,60 @@
+﻿.inventory-stats-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+}
+
+    .inventory-stats-card h4 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 1.2em;
+        font-weight: 600;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+    }
+
+    .inventory-stats-card h5 {
+        margin-top: 20px;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+        font-weight: 500;
+    }
+
+    .inventory-stats-card p {
+        margin: 8px 0;
+        line-height: 1.4;
+    }
+
+        .inventory-stats-card p strong {
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+    .inventory-stats-card ul {
+        margin: 10px 0;
+        padding-left: 20px;
+    }
+
+        .inventory-stats-card ul li {
+            margin: 5px 0;
+            line-height: 1.3;
+            list-style-type: disc;
+        }
+
+@media (max-width: 768px) {
+    .inventory-stats-card {
+        padding: 15px;
+        margin: 10px 0;
+    }
+
+        .inventory-stats-card h4 {
+            font-size: 1.1em;
+        }
+
+        .inventory-stats-card h5 {
+            font-size: 1em;
+        }
+}

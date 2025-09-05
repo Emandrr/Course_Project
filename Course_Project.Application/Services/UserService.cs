@@ -1,5 +1,6 @@
 ﻿using Course_Project.Application.Interfaces;
 using Course_Project.Domain.Models.UserModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,9 +13,13 @@ namespace Course_Project.Application.Services
     public class UserService : IUserService
     {
         private UserManager<User> _userManager;
-        public UserService(UserManager<User> userManager) 
+        private readonly string _folderId = "1o_vyB7A01EsYmwT-Aoaj4eaHny_kB1E7";
+        private readonly string _fileId = "1-MNB5BJ85Z6fOH01php9t2ym6syx6De4";
+        private readonly ICloudService _cloudService;
+        public UserService(UserManager<User> userManager, ICloudService cloudService)
         {
             _userManager = userManager;
+            _cloudService = cloudService;
         }
 
         public User Create(string Email,string Login)
@@ -24,7 +29,8 @@ namespace Course_Project.Application.Services
                 Login = Login,
                 Email = Email,
                 UserName = Login,
-                LockoutEnabled =false
+                LockoutEnabled =false,
+                PhotoLink = _fileId,
             };
         }
         public async Task<User> CreateWithoutPasswordAsync((string,string)ParseRes)

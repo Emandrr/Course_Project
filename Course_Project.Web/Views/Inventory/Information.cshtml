@@ -16,44 +16,55 @@
             {
                 <div class="inventory-photo-placeholder">
                     <div class="card-body d-flex align-items-center justify-content-center">
-                        <span class="no-image-text">No Image</span>
+                        <span class="no-image-text">@Localizer["No image"]</span>
                     </div>
                 </div>
             }
         </div>
 
-        <div class="col-md-9">
-            <div class="inventory-info-card">
-                <div class="card-body">
-                    <h2 class="inventory-title">@Model.inventory.Title</h2>
-                    <p class="inventory-created">
-                        Created (Utc): @Model.inventory.CreationDate
-                    </p>
-                    <p class="inventory-cr">
-                        Created by: @Model.inventory.User.Login
-                    </p>
-                    @if (!string.IsNullOrEmpty(Model.inventory.Description))
-                    {
-                        <p class="inventory-description">@Model.inventory.Description</p>
-                    }
-                    else
-                    {
-                        <p class="inventory-description-empty">(No description provided)</p>
-                    }
-                    @if(User.Identity.IsAuthenticated && (Model.inventory.IsPublic ||Model.inventory.User.UserName==User.Identity.Name ||
-                    User.IsInRole("Admin") || Model.UserAccess.Contains(User.Identity.Name)) ){
-                    <div class="inventory-actions">
-                        <a href="/Inventory/Details/@Model.inventory.PublicId" class="inventory-edit-btn">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-                        <form method="get" asp-action="Add" asp-controller="Item">
-                            <input type="hidden" name="InventoryId" value="@Model.inventory.PublicId" />
-                            <button type="submit" class="add-button">Add item</button>
-                        </form>
+        <div class="col-md-4">
+            <div class="inventory-info-tags-wrapper d-flex">
+                <div class="inventory-info-card flex-grow-1">
+                    <div class="card-body">
+                        <h2 class="inventory-title">@Model.inventory.Title</h2>
+                        <p class="inventory-created">
+                            @Localizer["Created utc"]: @Model.inventory.CreationDate
+                        </p>
+                        <p class="inventory-cr">
+                            @Localizer["Created by"]: @Model.inventory.User.Login
+                        </p>
+                        @if (!string.IsNullOrEmpty(Model.inventory.Description))
+                        {
+                            <p class="inventory-description">@Model.inventory.Description</p>
+                        }
+                        else
+                        {
+                            <p class="inventory-description-empty">@Localizer["(No description provided)"]</p>
+                        }
+                        @if (User.Identity.IsAuthenticated && (Model.inventory.IsPublic || Model.inventory.User.UserName == User.Identity.Name ||
+                                                User.IsInRole("Admin") || Model.UserAccess.Contains(User.Identity.Name)))
+                        {
+                            <div class="inventory-actions">
+                                <a href="/Inventory/Details/@Model.inventory.PublicId" class="btn btn-pr">
+                                    @Localizer["Edit"]
+                                </a>
+                                <form method="get" asp-action="Add" asp-controller="Item">
+                                    <input type="hidden" name="InventoryId" value="@Model.inventory.PublicId" />
+                                    <button type="submit" class="btn btn-pr">@Localizer["Add item"]</button>
+                                </form>
+                            </div>
+                        }
                     </div>
-                    }
                 </div>
             </div>
+        </div>
+        <div class="inventory-tags d-flex flex-wrap">
+            @foreach (var c in Model.inventory.InventoryTags)
+            {
+                <div class="tag-header me-2 mb-2">
+                    <span class="comment-author">@c.Tag.Name</span>
+                </div>
+            }
         </div>
     </div>
 
@@ -63,16 +74,16 @@
             {
                 <div class="items-table-card">
                     <div class="items-table-header">
-                        <h4 class="items-title">Items</h4>
+                        <h4 class="items-title">@Localizer["Items"]</h4>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="items-table">
                                 <thead class="items-table-head">
                                     <tr>
-                                        <th scope="col">Name</th>
-                                        <th scope="col">Creation Date</th>
-                                        <th scope="col">Likes</th>
+                                        <th scope="col">@Localizer["Name"]</th>
+                                        <th scope="col">@Localizer["Creation date"]</th>
+                                        <th scope="col">@Localizer["Likes"]</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -94,19 +105,129 @@
             {
                 <div class="empty-collection-card">
                     <div class="card-body text-center py-5">
-                        <h5 class="empty-collection-title">В инвентаре пока ничего нет</h5>
+                        <h5 class="empty-collection-title">@Localizer["Nothing in inventory"]</h5>
                     </div>
                 </div>
             }
         </div>
     </div>
-
+    <div class="comments-section">
+        <h4>@Localizer["Comments"]</h4>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="input-group">
+                <input type="text" id="commentInput" class="form-control" placeholder="@Localizer["Enter comment"]" />
+                <button class="btn btn-primary" id="sendBtn" onclick="sendComment()" disabled>@Localizer["Send"]</button>
+            </div>
+        }
+        else
+        {
+            <p>@Localizer["Sign in for comment"].</p>
+        }
+        <div class="row mt-4">
+            <div class="col-12">
+                <ul id="comments">
+                    @foreach (var c in Model.inventory.Comments)
+                    {
+                        <li id="@c.Id">
+                            <div class="comment-header">
+                                <span class="comment-author">@c.AuthorName</span>
+                                <span class="comment-date">@c.CreatedDate</span>
+                            </div>
+                            <div class="comment-text">@c.Description</div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+
+
 <script>
-    $(document).ready(function () {
-         $('tbody').on('click', 'tr', function () {
-            const itm = $(this).data('id');
-            window.location.href = '/Item/Information/' + itm;
-         });
+     $(document).ready(function () {
+          $('tbody').on('click', 'tr', function () {
+             const inv = $(this).data('id');
+             window.location.href = '/Item/Information/' + inv;
+
+          });
+     });
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/commentHub") 
+        .build();
+
+    const inventoryId = "@Model.inventory.PublicId";
+    const userName = "@Html.Raw(User.Identity.Name)";
+
+
+    connection.on("ReceiveComment", (comment) => {
+        const list = document.getElementById("comments");
+        const li = document.createElement("li");
+        li.id = comment.id;
+
+        const commentHeader = document.createElement("div");
+        commentHeader.className = "comment-header";
+
+
+        const authorSpan = document.createElement("span");
+        authorSpan.className = "comment-author";
+        authorSpan.textContent = comment.authorName;
+
+
+        const dateSpan = document.createElement("span");
+        dateSpan.className = "comment-date";
+        const date = new Date(comment.createdDate);
+
+        dateSpan.textContent = date.toLocaleDateString('ru-RU', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        }) + ' ' + date.toLocaleTimeString('ru-RU', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+
+
+        const textDiv = document.createElement("div");
+        textDiv.className = "comment-text";
+        textDiv.textContent = comment.description;
+
+        commentHeader.appendChild(authorSpan);
+        commentHeader.appendChild(dateSpan);
+        li.appendChild(commentHeader);
+        li.appendChild(textDiv);
+
+        list.appendChild(li);
+    });
+
+
+    connection.start()
+        .then(() => {
+            document.getElementById("sendBtn").disabled = false;
+        });
+
+
+    function sendComment() {
+        const content = document.getElementById("commentInput").value;
+        if (content.trim() !== "") {
+            connection.invoke("AddComment", content, userName,inventoryId)
+                .catch(err => console.error(err));
+            document.getElementById("commentInput").value = "";
+        }
+    }
+
+    connection.on("RemoveComments", (invId, commentIds) => {
+        if(invId !== inventoryId) return;
+        commentIds.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.remove();
+
+            const row = document.querySelector(`tr[data-id='${id}']`);
+            if(row) row.remove();
+        });
     });
 </script>
+
+

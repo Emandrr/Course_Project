@@ -33,5 +33,9 @@ namespace Course_Project.Application.Interfaces
         public Task<List<Inventory>> GetInventoriesAccessAsync(string id);
         public Task<List<Inventory>?> TrySearchAsync(string query);
         public Task<Inventory?> GetInventoryAsNoTrackingAsync(string id);
+        public Task<List<Inventory>> GetRecentAsync(int count);
+        public Task<List<Inventory>> GetTopByItemsAsync(int count);
+        public Task<List<Inventory>> TrySearchByTagAsync(string tag);
+        public Task DeleteSelectedAsync(List<Guid> guids);
     }
 }

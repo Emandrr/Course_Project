@@ -21,16 +21,16 @@
                         <input type="hidden" name="CustomSetOfIds.Index" value="@i" />
 
                         <div class="form-group">
-                            <label>Element Type</label>
+                            <label>@Localizer["Element Type"]</label>
                             <select name="CustomSetOfIds[@i].IdType" class="form-control id-type-select" data-index="@i">
-                                <option value="Text" selected="@(customId.IdType == IdType.Text)">Single Line Text</option>
-                                <option value="Rand20Bit" selected="@(customId.IdType == IdType.Rand20Bit)">Random 20-bit</option>
-                                <option value="Rand32Bit" selected="@(customId.IdType == IdType.Rand32Bit)">Random 32-bit</option>
-                                <option value="Rand6Digit" selected="@(customId.IdType == IdType.Rand6Digit)">Random 6 Digits</option>
-                                <option value="Rand9Digit" selected="@(customId.IdType == IdType.Rand9Digit)">Random 9 Digits</option>
-                                <option value="GUID" selected="@(customId.IdType == IdType.GUID)">GUID</option>
-                                <option value="DateTime" selected="@(customId.IdType == IdType.DateTime)">Date Time</option>
-                                <option value="Sequence" selected="@(customId.IdType == IdType.Sequence)">Sequence</option>
+                                <option value="Text" selected="@(customId.IdType == IdType.Text)">@Localizer["Single Line"]</option>
+                                <option value="Rand20Bit" selected="@(customId.IdType == IdType.Rand20Bit)">@Localizer["Random 20-bit"]</option>
+                                <option value="Rand32Bit" selected="@(customId.IdType == IdType.Rand32Bit)">@Localizer["Random 32-bit"]</option>
+                                <option value="Rand6Digit" selected="@(customId.IdType == IdType.Rand6Digit)">@Localizer["Random 6 Digits"]</option>
+                                <option value="Rand9Digit" selected="@(customId.IdType == IdType.Rand9Digit)">@Localizer["Random 9 Digits"]</option>
+                                <option value="GUID" selected="@(customId.IdType == IdType.GUID)">@Localizer["GUID"]</option>
+                                <option value="DateTime" selected="@(customId.IdType == IdType.DateTime)">@Localizer["Date Time"]</option>
+                                <option value="Sequence" selected="@(customId.IdType == IdType.Sequence)">@Localizer["Sequence"]</option>
                             </select>
                         </div>
 
@@ -39,7 +39,7 @@
                             @{
                                 string ruleValue = customId.Rule;
                                 int maxLength = 100;
-                                string placeholder = "Enter value";
+                                string placeholder = Localizer["Enter value"].ToString();
 
                                 switch (customId.IdType)
                                 {
@@ -49,18 +49,18 @@
                                     case IdType.Sequence:
                                     case IdType.GUID:
                                         maxLength = 1;
-                                        placeholder = "Enter separator";
+                                        placeholder = Localizer["Enter Separator"].ToString();
                                         if (string.IsNullOrEmpty(ruleValue)) ruleValue = "-";
                                         break;
                                     case IdType.Rand20Bit:
                                     case IdType.Rand32Bit:
                                         maxLength = 10;
-                                        placeholder = "Enter zeros for leading zeros";
+                                        placeholder = Localizer["Enter (zeros) for leading zeros "].ToString();
                                         if (string.IsNullOrEmpty(ruleValue)) ruleValue = "no-zeros";
                                         break;
                                     case IdType.DateTime:
                                         maxLength = 4;
-                                        placeholder = "Enter year, month, or date";
+                                        placeholder = Localizer["Enter year, month, or date"].ToString();
                                         if (string.IsNullOrEmpty(ruleValue)) ruleValue = "year";
                                         break;
                                 }
@@ -152,22 +152,32 @@
             updateSaveStatus('unsaved');
             startSaveTimerCustomId();
         });
-
+            const localizer = {
+            elementType: "@Localizer["Element Type"]",
+            text: "@Localizer["Single Line"]",
+            rand20: "@Localizer["Random 20-bit"]",
+            rand32: "@Localizer["Random 32-bit"]",
+            rand6: "@Localizer["Random 6 Digits"]",
+            rand9: "@Localizer["Random 9 Digits"]",
+            guid: "@Localizer["GUID"]",
+            datetime: "@Localizer["Date Time"]",
+            sequence: "@Localizer["Sequence"]"
+        };
         function createCustomIdGroup(index) {
             return `
                 <div class="custom-id-group" data-id="${index}" draggable="true">
                     <input type="hidden" name="CustomSetOfIds.Index" value="${index}" />
                     <div class="form-group">
-                        <label>Element Type</label>
+                        <label>${localizer.elementType}</label>
                         <select name="CustomSetOfIds[${index}].IdType" class="form-control id-type-select" data-index="${index}">
-                            <option value="Text">Single Line Text</option>
-                            <option value="Rand20Bit">Random 20-bit</option>
-                            <option value="Rand32Bit">Random 32-bit</option>
-                            <option value="Rand6Digit">Random 6 Digits</option>
-                            <option value="Rand9Digit">Random 9 Digits</option>
-                            <option value="GUID">GUID</option>
-                            <option value="DateTime">Date Time</option>
-                            <option value="Sequence">Sequence</option>
+                            <option value="Text">${localizer.text}</option>
+                            <option value="Rand20Bit">${localizer.rand20}</option>
+                            <option value="Rand32Bit">${localizer.rand32}</option>
+                            <option value="Rand6Digit">${localizer.rand6}</option>
+                            <option value="Rand9Digit">${localizer.rand9}</option>
+                            <option value="GUID">${localizer.guid}</option>
+                            <option value="DateTime">${localizer.datetime}</option>
+                            <option value="Sequence">${localizer.sequence}</option>
                         </select>
                     </div>
 
@@ -177,96 +187,77 @@
                 </div>
             `;
         }
+        const localizerInputs = {
+            elementType: "@Localizer["Element Type"]",
+            enterSeparator: "@Localizer["Enter Separator"]",
+            enterZeros: "@Localizer["Enter (zeros) for leading zeros"]",
+            enterYear: "@Localizer["Enter year, month, or date"]"
+        };
 
-        function getRuleInputForType(type, index) {
-            switch(type) {
-                case 'Rand6Digit':
-                case 'Rand9Digit':
-                case 'Text':
-                    return `
-                        <div class="form-group">
-                            <label class="rule-label">Text Separator (single character)</label>
-                            <input type="text"
-                                   name="CustomSetOfIds[${index}].Rule"
-                                   class="form-control universal-field"
-                                   data-index="${index}"
-                                   value="-"
-                                   maxlength="1"
-                                   placeholder="Enter separator" />
-                        </div>
-                    `;
+    function getRuleInputForType(type, index) {
+        switch(type) {
+            case 'Rand6Digit':
+            case 'Rand9Digit':
+            case 'Text':
+            case 'Sequence':
+            case 'GUID':
+                return `
+                    <div class="form-group">
+                        <label class="rule-label">${localizerInputs.elementType}</label>
+                        <input type="text"
+                               name="CustomSetOfIds[${index}].Rule"
+                               class="form-control universal-field"
+                               data-index="${index}"
+                               value="-"
+                               maxlength="1"
+                               placeholder="${localizerInputs.enterSeparator}" />
+                    </div>
+                `;
 
-                case 'Rand20Bit':
-                case 'Rand32Bit':
-                    return `
-                        <div class="form-group">
-                            <label class="rule-label">Zeros label</label>
-                            <input type="text"
-                                   name="CustomSetOfIds[${index}].Rule"
-                                   class="form-control universal-field"
-                                   data-index="${index}"
-                                   value="no-zeros"
-                                   maxlength="10"
-                                   placeholder="Enter zeros for leading zeros" />
-                        </div>
-                    `;
+            case 'Rand20Bit':
+            case 'Rand32Bit':
+                return `
+                    <div class="form-group">
+                        <label class="rule-label">${localizerInputs.elementType}</label>
+                        <input type="text"
+                               name="CustomSetOfIds[${index}].Rule"
+                               class="form-control universal-field"
+                               data-index="${index}"
+                               value="no-zeros"
+                               maxlength="10"
+                               placeholder="${localizerInputs.enterZeros}" />
+                    </div>
+                `;
 
-                case 'GUID':
-                    return `
-                        <div class="form-group">
-                            <label class="rule-label">GUID Separator (single character)</label>
-                            <input type="text"
-                                   name="CustomSetOfIds[${index}].Rule"
-                                   class="form-control universal-field"
-                                   data-index="${index}"
-                                   value="-"
-                                   maxlength="1"
-                                   placeholder="Enter separator" />
-                        </div>
-                    `;
+            case 'DateTime':
+                return `
+                    <div class="form-group">
+                        <label class="rule-label">${localizerInputs.elementType}</label>
+                        <input type="text"
+                               name="CustomSetOfIds[${index}].Rule"
+                               class="form-control universal-field"
+                               data-index="${index}"
+                               value="year"
+                               maxlength="4"
+                               placeholder="${localizerInputs.enterYear}" />
+                    </div>
+                `;
 
-                case 'DateTime':
-                    return `
-                        <div class="form-group">
-                            <label class="rule-label">Date Format</label>
-                            <input type="text"
-                                   name="CustomSetOfIds[${index}].Rule"
-                                   class="form-control universal-field"
-                                   data-index="${index}"
-                                   value="year"
-                                   maxlength="4"
-                                   placeholder="Enter year, month, or date" />
-                        </div>
-                    `;
-
-                case 'Sequence':
-                    return `
-                        <div class="form-group">
-                            <label class="rule-label">Sequence Separator (single character)</label>
-                            <input type="text"
-                                   name="CustomSetOfIds[${index}].Rule"
-                                   class="form-control universal-field"
-                                   data-index="${index}"
-                                   value="-"
-                                   maxlength="1"
-                                   placeholder="Enter separator" />
-                        </div>
-                    `;
-
-                default:
-                    return `
-                        <div class="form-group">
-                            <label class="rule-label">Value</label>
-                            <input type="text"
-                                   name="CustomSetOfIds[${index}].Rule"
-                                   class="form-control universal-field"
-                                   data-index="${index}"
-                                   value="-"
-                                   placeholder="Enter value" />
-                        </div>
-                    `;
-            }
+            default:
+                return `
+                    <div class="form-group">
+                        <label class="rule-label">${localizerInputs.elementType}</label>
+                        <input type="text"
+                               name="CustomSetOfIds[${index}].Rule"
+                               class="form-control universal-field"
+                               data-index="${index}"
+                               value="-"
+                               placeholder="${localizerInputs.enterSeparator}" />
+                    </div>
+                `;
         }
+    }
+
 
         $(document).on('change', '.id-type-select', function() {
             const index = $(this).data('index');

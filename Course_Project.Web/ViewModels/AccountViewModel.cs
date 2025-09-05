@@ -8,5 +8,6 @@ namespace Course_Project.Web.ViewModels
 
         public List<Inventory> EditInventories { get; set; } = new List<Inventory>();
         public List<Inventory> UserInventories { get; set; } = new List<Inventory>();
+        public string? Photo { get; set; }
     }
 }

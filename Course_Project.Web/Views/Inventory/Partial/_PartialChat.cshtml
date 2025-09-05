@@ -1,1 +1,53 @@
-﻿
+﻿<button class="btn btn-ed" onclick="deleteSelectedComments()">@Localizer["Delete"]</button>
+<table class="table table-striped table-bordered chat-table">
+    <thead>
+        <tr>
+            <th scope="col">
+                <input type="checkbox" id="selectDeselect" />
+            </th>
+            <th scope="col">@Localizer["Author"]</th>
+            <th scope="col">@Localizer["Content"]</th>
+            <th scope="col">@Localizer["Date of posting"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var comment in Model.inventory.Comments)
+        {
+            <tr data-id="@comment.PublicId">
+                <td>
+                    <input type="checkbox" id="@comment.PublicId" name="PublicId" value="@comment.PublicId" class="checkboxtable" />
+                </td>
+                <td>@comment.AuthorName</td>
+                <td>@comment.Description</td>
+                <td>@comment.CreatedDate</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+<script>
+    function showTab(tabName, button) {
+        const allTabs = document.querySelectorAll('.tab-panel');
+        allTabs.forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        const allButtons = document.querySelectorAll('.nav-tab');
+        allButtons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+        const selectedTab = document.getElementById(tabName + '-tab');
+        if (selectedTab) {
+            selectedTab.classList.add('active');
+        }
+        button.classList.add('active');
+    }
+
+
+    document.getElementById('selectDeselect').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.checkboxtable');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+
+</script>
+

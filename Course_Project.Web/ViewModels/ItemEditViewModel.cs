@@ -17,9 +17,11 @@ namespace Course_Project.Web.ViewModels
         [AllowedExtensions(new[] { ".jpg", ".png", ".jpeg" })]
         [MaxFileSize(12 * 1024 * 1024)]
         public IFormFile? ImageFile { get; set; }
-        public Item Item { get; set; }
+        public Item? Item { get; set; }
         public bool HasChance { get; set; } = false;
         public bool IsSet { get; set; }
+        public string? ItmId { get; set; }
+        public string? InvId { get; set; }
         public string? Photo { get; set; }
     }
 }

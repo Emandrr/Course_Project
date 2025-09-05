@@ -20,16 +20,18 @@ namespace Course_Project.Application.Services
         
         private readonly IItemRepository _itemRepository; 
         private readonly ILikeRepository _likeRepository;
+        private readonly IInventoryService _inventoryService;
         private readonly UserManager<User> _userManager;
         private readonly ICloudService _cloudService;
         private readonly string _folderId = "1o_vyB7A01EsYmwT-Aoaj4eaHny_kB1E7";
         private readonly string _fileId = "1-MNB5BJ85Z6fOH01php9t2ym6syx6De4";
-        public ItemService(IItemRepository itemRepository,UserManager<User> userManager,ILikeRepository likeRepository,ICloudService cloudService)
+        public ItemService(IItemRepository itemRepository,UserManager<User> userManager,ILikeRepository likeRepository,ICloudService cloudService,IInventoryService inventoryService)
         {
             _itemRepository = itemRepository;
             _userManager = userManager;
             _likeRepository = likeRepository;
             _cloudService = cloudService;
+            _inventoryService = inventoryService;
         }
         public Item Set(int InventoryId, string Name, string CreatorName, List<CustomField> CustomFields, string CustomId, IFormFile file)
         {
@@ -42,11 +44,13 @@ namespace Course_Project.Application.Services
                 CustomId = CustomId,
                 CreationDate = DateTime.UtcNow,
                 PublicId = Guid.NewGuid(),
-                PhotoLink = file == null ? _fileId : _cloudService.UploadPhoto(_folderId, file)
+                PhotoLink = file == null ? _fileId : _cloudService.UploadPhoto(_folderId, file),
+                CustomIdWithInventoryId = CustomId+InventoryId.ToString()
             }; 
         }
         public async Task<Guid> CreateAsync(int InventoryId, string Name, string CreatorName, List<CustomField> CustomFields, string CustomId, IFormFile file)
         {
+
             Item item = Set(InventoryId, Name, CreatorName, CustomFields, CustomId, file);
             await _itemRepository.CreateAsync(item);
             return item.PublicId;
@@ -64,7 +68,7 @@ namespace Course_Project.Application.Services
         public async Task<bool> HasLikeAsync(string Username, Guid ItemId)
         {
             if (Username == null) return false;
-            User usr = await _userManager.FindByNameAsync(Username);
+            User? usr = await _userManager.FindByNameAsync(Username);
             if (usr!=null)
             {
                 List<string> UserIds = await _itemRepository.GetUserLikesAsync(ItemId);
@@ -75,16 +79,52 @@ namespace Course_Project.Application.Services
         }
         public async Task SetLike(string name, Guid invid)
         {
-            User user = await _userManager.FindByNameAsync(name);
-            Item item = await _itemRepository.GetItemByIdAsNoTrackingAsync(invid);
+            User? user = await _userManager.FindByNameAsync(name);
+            Item? item = await _itemRepository.GetItemByIdAsNoTrackingAsync(invid);
             if (user != null && item != null) await _likeRepository.SetLike(new Like() { ItemId = item.Id, UserId = user.Id });
         }
         public async Task RemoveLike(string name, Guid invid)
         {
-            User user = await _userManager.FindByNameAsync(name);
-            Item item = await _itemRepository.GetItemByIdAsNoTrackingAsync(invid);
+            User? user = await _userManager.FindByNameAsync(name);
+            Item? item = await _itemRepository.GetItemByIdAsNoTrackingAsync(invid);
             if (user != null && item != null) await _likeRepository.RemoveLike(new Like() { ItemId=item.Id,UserId=user.Id});
         }
+        public async Task<Item?> GetItemByCustomIdAsync(string customid)
+        {
+            return await _itemRepository.GetItemByCustomIdAsync(customid);
+        }
+        public async Task EditItemAsync(string Name, List<CustomField> customFields, string customId, IFormFile file,string ItmId)
+        {
+            if (Guid.TryParse(ItmId, out Guid id))
+            {
+                Item? item = await _itemRepository.GetItemByIdAsync(id);
+                if (item != null)
+                {
+                    ReSet(Name, customFields, customId, file, item);
+                    await _itemRepository.UpdateAsync(item);
+                }
+            }
 
+        }
+        public void ReSet(string Name, List<CustomField> CustomFields, string CustomId, IFormFile file,Item item)
+        {
+            item.Name = Name;
+            item.CustomFields = CustomFields;
+            item.PhotoLink = file == null ? _fileId : _cloudService.UploadPhoto(_folderId, file);
+            item.CustomId = CustomId;
+        }
+
+        public async Task<bool> CheckOnCustomId(string customId,string PublicItmId,string PublicInvId)
+        {
+            Inventory inv = await _inventoryService.GetInventoryAsNoTrackingAsync(PublicInvId);
+            Item itm = await _itemRepository.GetItemByCustomIdAsync(customId+inv.Id.ToString());
+            if(itm==null || itm.PublicId.ToString()==PublicItmId) return true;
+            return false;  
+        }
+        public async Task DeleteSelectedAsync(Guid[] guids)
+        {
+            var ans = await _itemRepository.GetItemOnGuidsAsync(guids.ToList());
+            await _itemRepository.DeleteItemsAsync(ans);
+        }
     }
 }

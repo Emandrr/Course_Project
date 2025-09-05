@@ -1,8 +1,9 @@
 using Course_Project.Application.Interfaces;
+using Course_Project.Application.Services;
+using Course_Project.Web.ViewModels;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-
 
 namespace Course_Project.Web.Controllers;
 
@@ -10,17 +11,25 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly IInventoryService _inventoryService;
+    private readonly ITagService _tagService;
 
-    public HomeController(ILogger<HomeController> logger,IInventoryService inventoryService)
+    public HomeController(ILogger<HomeController> logger,IInventoryService inventoryService,ITagService tagService)
     {
         _logger = logger;
         _inventoryService = inventoryService;
+        _tagService = tagService;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-
-        return View();
+        var recent = await _inventoryService.GetRecentAsync(5);
+        var topByItems = await _inventoryService.GetTopByItemsAsync(5);
+        return View(new HomeViewModel
+        {
+            RecentInventories = recent,
+            TopByItemsInventories = topByItems,
+            AllTags = await _tagService.GetAllTagsNamesAcync()
+        });
     }
 
     public IActionResult Privacy()

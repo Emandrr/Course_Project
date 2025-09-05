@@ -7,7 +7,8 @@ namespace Course_Project.Web.ViewModels
         public Item Item { get; set; }
         public bool HasChance { get; set; } = false;
         public bool IsSet { get; set; }
-
-        public string? Photo { get; set; } 
+        public bool IsEdit { get; set; }
+        public string? Photo { get; set; }
+        public Inventory? Inventory { get; set; }
     }
 }

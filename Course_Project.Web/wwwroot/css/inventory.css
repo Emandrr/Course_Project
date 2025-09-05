@@ -41,7 +41,6 @@
 }
 
 .content-container {
-    display: flex;
     gap: 40px;
     align-items: flex-start;
     padding-block-end: 5%;
@@ -51,20 +50,34 @@
     flex: 0 0 500px;
     min-width: 0;
 }
+.tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--bs-input-bg);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 14px;
+    margin: 4px;
+    white-space: nowrap;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
 
 .inventory-edit-container,
 .id-sidebar,
 .elements-sidebar {
     flex: 1;
-    border: 1px solid;
-    border-color: var( --bs-border-color);
+    border: 1px solid var(--bs-border-color);
     border-radius: 8px;
-    padding-right: 20px;
-    padding-left: 20px;
-    padding-bottom: 20px;
-    height: 53vh;
+    padding: 20px;
     margin-block-end: 5vh;
     margin-block-start: 20px;
+    background-color: var(--bs-card-bg);
+    color: var(--bs-body-color);
+    max-height: 400px;
     overflow-y: auto;
 }
 
@@ -86,8 +99,8 @@ label {
     color: var(--bs-body-color);
 }
 
-input[type="text"],
-input[type="file"],
+.main-form input[type="text"],
+.main-form input[type="file"],
 select {
     width: 100%;
     padding: 10px 12px;
@@ -134,15 +147,6 @@ input[type="file"] {
     margin-top: 15px;
 }
 
-.btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    text-decoration: none;
-    display: inline-block;
-}
 
     .btn:hover {
         text-decoration: none;
@@ -156,8 +160,11 @@ input[type="file"] {
 }
 
 .btn-secondary {
-    background-color: var(--bs-btn-secondary-bg);
     color: white;
+    border:none;
+}
+.btn-scnd{
+    color:#ffffff;
 }
 
 .btn-danger {
@@ -236,53 +243,6 @@ input[type="file"] {
         cursor: pointer;
     }
 
-.theme-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: var(--bs-btn-secondary-bg);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    font-size: 18px;
-    z-index: 1000;
-}
 
-    .theme-toggle:hover {
-        background-color: var(--bs-btn-secondary-hover-bg);
-    }
 
-@media (max-width: 768px) {
-    .content-container {
-        flex-direction: column;
-        gap: 20px;
-    }
 
-    .main-form {
-        flex: none;
-    }
-
-    .elements-sidebar {
-        flex: none;
-    }
-
-    .inventory-title {
-        font-size: 1.5rem;
-    }
-}
-#addIdsBtn,
-#addElemsBtn {
-    display: block;
-    margin-top: 20px;
-    margin-left: 0;
-    margin-top: auto;
-}
-.tab-panel {
-    display: none;
-}
-    .tab-panel.active {
-        display: block;
-    }

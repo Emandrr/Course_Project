@@ -33,6 +33,8 @@ namespace Course_Project.DataAccess.Repostories
                                   .Include(p=>p.UserAccesses)
                                   .Include(p=>p.CustomSetOfIds)
                                   .Include(p => p.User)
+                                  .Include(i => i.InventoryTags)
+                                                       .ThenInclude(it => it.Tag)
                                   .FirstOrDefaultAsync();
         }
         public async Task<Inventory?> GetInventoryByIdAsNoTrackingAsync(Guid id)
@@ -47,11 +49,12 @@ namespace Course_Project.DataAccess.Repostories
                                   .Include(p=>p.Category)
                                   .Include(i => i.InventoryTags)
                                                        .ThenInclude(it => it.Tag)
+                                  .Include(i=>i.Comments)
                                   .AsNoTracking()
                                   .FirstOrDefaultAsync();
         }
         public async Task SaveAllAsync() =>
-                 await _context.SaveChangesAsync();
+                  await _context.SaveChangesAsync();
         public async Task<List<Inventory>> GetAllAsync()
         {
             return await _context.Inventories.Include(p=>p.User).ToListAsync();
@@ -109,7 +112,44 @@ namespace Course_Project.DataAccess.Repostories
         }
         public async Task<List<Inventory>> TryGetByNameAsync(string Name)
         {
-            return await _context.Inventories.Where(inv=>inv.Title ==Name).ToListAsync();
+            return await _context.Inventories.Where(inv=>inv.Title ==Name).Include(inv=>inv.User).ToListAsync();
         }
+        public async Task<List<Inventory>> TryGetByTagAsync(string tagName)
+        {
+            return await _context.Inventories
+                .Where(inv => inv.InventoryTags.Any(it => it.Tag.Name == tagName)).Include(inv => inv.User)
+                .ToListAsync();
+        }
+        public async Task<List<Inventory>> GetRecentAsync(int count)
+        {
+            return await _context.Inventories
+                .AsNoTracking()
+                .Include(i => i.User)
+                .Include(i=>i.Items)
+                .OrderByDescending(i => i.CreationDate)
+                .Take(count)
+                .ToListAsync();
+        }
+
+        public async Task<List<Inventory>> GetTopByItemsAsync(int count)
+        {
+            return await _context.Inventories
+                .AsNoTracking()
+                .Include(i => i.User) 
+                .Include(i => i.Items)
+                .OrderByDescending(i => i.Items.Count)
+                .Take(count)
+                .ToListAsync();
+        }
+        public async Task<List<Inventory>> GetInventoryOnGuidsAsync(List<Guid> ids)
+        {
+            return await _context.Inventories.Where(c => ids.Contains(c.PublicId)).ToListAsync();
+        }
+        public async Task DeleteItemsAsync(List<Inventory> invs)
+        {
+            _context.Inventories.RemoveRange(invs);
+            await SaveAllAsync();
+        }
+
     }
 }

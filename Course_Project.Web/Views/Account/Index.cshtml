@@ -1,28 +1,46 @@
 ﻿@model AccountViewModel
+<link rel="stylesheet" href="~/css/account.css" />
 
-<div class="user-info">
-	<h1>
-		@Model.user.Login
-	</h1>
-	<h1>
-        @Model.user.Email
-	</h1>
+<div class="user-info-container">
+    @if (!string.IsNullOrEmpty(Model.Photo))
+    {
+        <div class="inventory-photo-card">
+            <img src="@Model.Photo" class="inventory-photo" alt="Inventory Photo">
+        </div>
+    }
+    else
+    {
+        <div class="inventory-photo-placeholder">
+            <span class="no-image-text">@Localizer["No image"]</span>
+        </div>
+    }
+
+    <div class="user-info">
+        <h1>@Model.user.Login</h1>
+        <h1>@Model.user.Email</h1>
+    </div>
 </div>
+
+<form method="post">
 <div class="cont">
     <a asp-controller="Inventory" asp-action="Create" asp-route-id="@Model.user.Id" class="btn">@Localizer["Create new inventory"]</a>
-    <div class="tab-container"> 
+        <input type="hidden" name="UserName" value="@Model.user.UserName" />
+    <div class="tab-container">
         <nav>
             <ul class="tab-nav">
                 <li class="tab-item">
-                    <a href="#" class="tab-link active" data-tab="inventories">My Inventories</a>
+                    <a href="#" class="tab-link active" data-tab="inventories">@Localizer["My inventories"]</a>
                 </li>
                 <li class="tab-item">
-                    <a href="#" class="tab-link" data-tab="edit">Edit Inventories</a>
+                    <a href="#" class="tab-link" data-tab="edit">@Localizer["Edit inventories"]</a>
                 </li>
             </ul>
         </nav>
     </div>
     <div class="my-tab-content" style="display:block;">
+            <button type="submit" class="btn" asp-action="DeleteSelected" asp-controller="Inventory" id="blockBtn">
+                <i class="fas fa-ban me-1"></i>@Localizer["Delete selected"]
+            </button>
         <div id="inventories-content" class="tab-panel">
             <table class="table table-striped table-bordered user-table">
                 <thead>
@@ -30,10 +48,10 @@
                         <th scope="col">
                             <input type="checkbox" id="selectDeselect" />
                         </th>
-                        <th scope="col">ID</th>
-                        <th scope="col">Full Name</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Status</th>
+                        <th scope="col">@Localizer["Public id"]</th>
+                        <th scope="col">@Localizer["Name"]</th>
+                        <th scope="col">@Localizer["Description"]</th>
+                        <th scope="col">@Localizer["Creator"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,14 +59,12 @@
                     {
                         <tr data-id="@invs.Id">
                             <td>
-                                <input type="checkbox" id="@invs.Id" name="InventoryId" value="@invs.Id" class="checkboxtable" />
+                                <input type="checkbox" id="@invs.Id" name="InventoryId" value="@invs.PublicId" class="checkboxtable" />
                             </td>
-                            <td>@invs.Id</td>
+                            <td>@invs.PublicId</td>
                             <td>@invs.Title</td>
                             <td>@invs.Description</td>
-                            <td>
-                                <span class="status-active">Active</span>
-                            </td>
+                            <td>@invs.User.Login</td>
                         </tr>
                     }
                 </tbody>
@@ -60,28 +76,20 @@
             <table class="table table-striped table-bordered user-table">
                 <thead>
                     <tr>
-                        <th scope="col">
-                            <input type="checkbox" id="selectDeselect" />
-                        </th>
-                        <th scope="col">ID</th>
-                        <th scope="col">Full Name</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Status</th>
+                        <th scope="col">@Localizer["Public id"]</th>
+                        <th scope="col">@Localizer["Name"]</th>
+                        <th scope="col">@Localizer["Description"]</th>
+                        <th scope="col">@Localizer["Creator"]</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var invs in Model.EditInventories)
                     {
                         <tr data-id="@invs.Id">
-                            <td>
-                                <input type="checkbox" id="@invs.Id" name="InventoryId" value="@invs.Id" class="checkboxtable" />
-                            </td>
-                            <td>@invs.Id</td>
+                            <td>@invs.PublicId</td>
                             <td>@invs.Title</td>
                             <td>@invs.Description</td>
-                            <td>
-                                <span class="status-active">Active</span>
-                            </td>
+                            <td>@invs.User.Login</td>
                         </tr>
                     }
                 </tbody>
@@ -89,8 +97,15 @@
         </div>
      </div>
 </div>
+</form>
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById('selectDeselect').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.checkboxtable');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+    $(document).ready(function () {
         const myTab = document.querySelector(".my-tab-content");
         const editTab = document.querySelector(".edit-tab-content");
         const links = document.querySelectorAll(".tab-link");

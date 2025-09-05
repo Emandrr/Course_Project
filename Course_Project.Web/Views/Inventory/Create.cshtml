@@ -1,32 +1,31 @@
 ﻿@model Course_Project.Web.ViewModels.InventoryCreateViewModel;
 <link rel="stylesheet" href="~/css/inventory.css" />
 
-<div class="project-wrapper">
-	<h1 class="inventory-title">Create new inventory</h1>
+	<h1 class="inventory-title">@Localizer["Create new inventory"]</h1>
 
 	<form method="post" asp-controller="Inventory" asp-action="Create" enctype="multipart/form-data">
 		<div class="content-container">
 			<div class="main-form">
 				<div class="form-group">
-					<label for="Title">Title</label>
-					<input name="Title" id="Title" type="text" autocomplete="on" placeholder="Enter title" />
+					<label for="Title">@Localizer["Title"]</label>
+					<input name="Title" id="Title" type="text" autocomplete="on" placeholder="@Localizer["Enter title"]" />
 					<span class="text-danger field-validation-valid" data-valmsg-for="inventory.Title" data-valmsg-replace="true"></span>
 				</div>
 
 				<div class="form-group">
-					<label for="Description">Description</label>
-					<input name="Description" id="Description" type="text" autocomplete="on" placeholder="Enter description" />
+					<label for="Description">@Localizer["Description"]</label>
+					<input name="Description" id="Description" type="text" autocomplete="on" placeholder="@Localizer["Enter description"]" />
 					<div class="validation-message"></div>
 				</div>
 
 				<div class="form-group form-check">
 					<input asp-for="IsPublic" class="form-check-input" />
-					<label asp-for="IsPublic" class="form-check-label">Public</label>
+					<label asp-for="IsPublic" class="form-check-label">@Localizer["Public"]</label>
 					<span asp-validation-for="IsPublic" class="text-danger"></span>
 				</div>
 
 				<div class="form-group">
-					<label for="ImageFile">Выберите фотографию</label>
+					<label for="ImageFile">@Localizer["Choose photo"]</label>
 					<input name="ImageFile" id="ImageFile" type="file" class="form-control-file" accept="image/*">
 					<span class="text-danger"></span>
 				</div>
@@ -35,58 +34,76 @@
 
 				<input type="hidden" name="UserId" value="@Model.UserId" />
 
-				<div class="form-buttons">
-					<button type="button" id="addElemBtn" class="btn btn-secondary">Add Element</button>
-					<button type="submit" class="login-button">Create new inventory</button>
-				</div>
 				<div class="form-group">
-					<label asp-for="SelectedCategoryId" class="control-label"></label>
+					<label asp-for="SelectedCategoryId" class="control-label">@Localizer["Select category"]</label>
 					<select asp-for="SelectedCategoryId" asp-items="@(new SelectList(Model.Categories, "Id", "Name"))" class="form-control">
 					</select>
 					<span asp-validation-for="SelectedCategoryId" class="text-danger"></span>
 				</div>
-			</div><div class="form-group">
-				<label for="tagInput">Tags</label>
-				<input type="text" id="tagInput" placeholder="Начни вводить тег" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label for="tagInput">@Localizer["Tags"]</label>
+				<input type="text" id="tagInput" placeholder="@Localizer["Input tag"]" class="form-control" />
 				<div id="suggestions" class="suggestions"></div>
 				<div id="selectedTags" class="selected-tags"></div>
 				<input type="hidden" name="Tags" id="hiddenTags" />
 			</div>
+		<div class="form-buttons">
+			<button type="submit" class="btn btn-scnd">@Localizer["Create new inventory"]</button>
+			<button type="button" id="addElemBtn" class="btn btn-secondary">@Localizer["Add element"]</button>
+		</div>
 			<div class="elements-sidebar">
-				<h3 class="elements-title">Custom Elements</h3>
+				<h3 class="elements-title">@Localizer["Custom elements"]</h3>
 				<div id="customElemsContainer">
 				</div>
 			</div>
 		</div>
 	</form>
-</div>
 <script>
+		function getLocalizedText(key) {
+		const translations = {
+			'ElementName': '@Localizer["Element name"]',
+			'Description': '@Localizer["Description"]',
+			'ElementType': '@Localizer["Element type"]',
+			'SingleLineText': '@Localizer["Single line text"]',
+			'MultilineText': '@Localizer["Multi line text"]',
+			'Number': '@Localizer["Number"]',
+			'Boolean': '@Localizer["Boolean"]',
+			'Link': '@Localizer["Link"]',
+			'Visible': '@Localizer["Visible"]'
+		};
+		return translations[key] || key;
+	}
 	$(document).ready(function () {
 		let elemIndex = @Model.CustomElems.Count;
 		$('#addElemBtn').click(function () {
-			const newElemHtml = `
-				<div class="custom-elem-group" data-id="${elemIndex}" draggable="true">
-				<input type="hidden" name="CustomElems.Index" value="${elemIndex}" />
-					<div class="form-group">
-						<label>Element Name</label>
-						<input name="CustomElems[${elemIndex}].Name" class="form-control" />
-					</div>
-					<div class="form-group">
-						<label>Element Type</label>
-						<select name="CustomElems[${elemIndex}].FieldType" class="form-control">
-							<option value="SingleLine">Single Line Text</option>
-							<option value="MultiLine">Multiline Text</option>
-							<option value="Numeric">Number</option>
-							<option value="Checkbox">Boolean</option>
-							<option value="Link">Link</option>
-						</select>
-					</div>
-					<div class="checkbox-group">
-						<input type="checkbox" id="isVisible_${elemIndex}" name="CustomElems[${elemIndex}].IsVisible" />
-						<label for="isVisible">Visible</label>
-					</div>
-				</div>
-			`;
+		const newElemHtml = `
+		<div class="custom-elem-group" data-id="${elemIndex}" draggable="true">
+			<input type="hidden" name="CustomElems.Index" value="${elemIndex}" />
+			<div class="form-group">
+				<label>${getLocalizedText('ElementName')}</label>
+				<input name="CustomElems[${elemIndex}].Name" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label>${getLocalizedText('Description')}</label>
+				<input name="CustomElems[${elemIndex}].Description" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label>${getLocalizedText('ElementType')}</label>
+				<select name="CustomElems[${elemIndex}].FieldType" class="form-control">
+					<option value="SingleLine">${getLocalizedText('SingleLineText')}</option>
+					<option value="MultiLine">${getLocalizedText('MultilineText')}</option>
+					<option value="Numeric">${getLocalizedText('Number')}</option>
+					<option value="Checkbox">${getLocalizedText('Boolean')}</option>
+					<option value="Link">${getLocalizedText('Link')}</option>
+				</select>
+			</div>
+			<div class="checkbox-group">
+				<input type="checkbox" id="isVisible_${elemIndex}" name="CustomElems[${elemIndex}].IsVisible" />
+				<label for="isVisible_${elemIndex}">${getLocalizedText('Visible')}</label>
+			</div>
+		</div>
+		`;
 			$('#customElemsContainer').append(newElemHtml);
 			elemIndex++;
 
@@ -199,29 +216,37 @@
 	});
 
 	function addTag(name) {
-		if (chosen.includes(name)) return; 
+		if (chosen.includes(name)) return;
 
 		chosen.push(name);
 
 		const span = document.createElement("span");
 		span.textContent = name;
 		span.classList.add("tag");
+		span.setAttribute("draggable", "true");
 
-		const removeBtn = document.createElement("button");
-		removeBtn.textContent = "×";
-		removeBtn.type = "button";
-		removeBtn.addEventListener("click", () => {
-			chosen = chosen.filter(t => t !== name);
-			span.remove();
-			syncHidden();
+		selectedTags.appendChild(span);
+		syncHidden();
+
+		span.addEventListener("dragstart", (e) => {
+			span.classList.add("dragging");
+			e.dataTransfer.effectAllowed = "move";
 		});
 
-		span.appendChild(removeBtn);
-		selectedTags.appendChild(span);
-
-		syncHidden();
+		span.addEventListener("dragend", () => {
+			span.classList.remove("dragging");
+			syncHidden();
+		});
 	}
-
+		document.addEventListener("drop", (e) => {
+		const dragging = document.querySelector(".tag.dragging");
+		if (dragging && !selectedTags.contains(e.target)) {
+			const name = dragging.textContent;
+			dragging.remove();
+			chosen = chosen.filter(t => t !== name);
+			syncHidden();
+		}
+	});
 	function syncHidden() {
 		hiddenTags.value = JSON.stringify(chosen);
 	}

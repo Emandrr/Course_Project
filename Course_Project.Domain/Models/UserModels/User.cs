@@ -16,5 +16,6 @@ namespace Course_Project.Domain.Models.UserModels
         public List<Inventory>UserInventories{get;set;}=new List<Inventory>();
         public List<UserInventoryAccess> InventoryAccesses { get; set; } = new List<UserInventoryAccess>();
         public List<Like> Likes { get; set; } = new List<Like>();
+        public string? PhotoLink { get; set; }
     }
 }

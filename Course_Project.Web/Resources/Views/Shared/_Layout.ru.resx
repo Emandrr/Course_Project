@@ -118,15 +118,27 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Account" xml:space="preserve">
-    <value>Account</value>
+    <value>Аккаунт</value>
   </data>
   <data name="Admin" xml:space="preserve">
     <value>Админ</value>
+  </data>
+  <data name="All inventories" xml:space="preserve">
+    <value>Все инвентари</value>
   </data>
   <data name="Home" xml:space="preserve">
     <value>Главная</value>
   </data>
   <data name="Login" xml:space="preserve">
     <value>Вход</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>Регистрация</value>
+  </data>
+  <data name="Search inventory by name..." xml:space="preserve">
+    <value>Найти инвентарь по имени...</value>
   </data>
 </root>

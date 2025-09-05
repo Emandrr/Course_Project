@@ -1,33 +1,127 @@
 ﻿@model ItemViewModel
-<link rel="stylesheet" href="~/css/site.css" />
-@if (!string.IsNullOrEmpty(Model.Photo))
-{
-    <div class="inventory-photo-card">
-        <img src="@Model.Photo" class="inventory-photo" alt="Inventory Photo">
-    </div>
-}
-else
-{
-    <div class="inventory-photo-placeholder">
-        <div class="card-body d-flex align-items-center justify-content-center">
-            <span class="no-image-text">No Image</span>
+<link rel="stylesheet" href="~/css/item-info.css" />
+
+
+    <div class="item-header">
+        <div class="item-avatar">
+            @if (!string.IsNullOrEmpty(Model.Photo))
+            {
+            <img src="@Model.Photo" alt="Item Photo">
+        }
+        else
+        {
+            <i class="fas fa-user no-image-icon"></i>
+        }
+        </div>
+
+        <div class="item-info">
+            <h1 class="item-title">@Model.Item.Name</h1>
+
+            <div class="item-meta">
+                <div class="item-creator">@Localizer["Created"]: @Model.Item.CreatorName</div>
+            <div class="item-date">@Localizer["Created on"] Utc: @Model.Item.CreationDate.ToString("dd.MM.yyyy HH:mm:ss")</div>
+            </div>
+
+            <div class="item-actions">
+                <div class="like-section">
+                    <span class="like-count">@Model.Item.Likes.Count()</span>
+
+                    <form id="addItemForm" method="post" asp-action="Like" style="display: inline;">
+                        <input type="hidden" name="CreatorName" value="@User.Identity.Name" />
+                        <input type="hidden" name="ItmId" value="@Model.Item.PublicId" />
+
+                        @if (Model.HasChance)
+                        {
+                            <button id="submitBtn" type="submit" class="like-btn @(Model.IsSet ? "liked" : "")">
+                                <span class="heart-icon @(Model.IsSet ? "filled" : "")"></span>
+                            </button>
+                        }
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
+
+    @if (Model.Inventory.CustomElems.Any())
+    {
+        <div class="custom-fields">
+            @for (int i = 0; i < Model.Inventory.CustomElems.Count; i++)
+            {
+                var field = Model.Inventory.CustomElems[i];
+                <div class="custom-field">
+                    <div class="custom-field-label">@field.Name</div>
+
+                    @{
+                        string displayValue = "";
+                        bool hasValue = false;
+
+                        if (i < Model.Item.CustomFields.Count)
+                        {
+                            var customField = Model.Item.CustomFields[i];
+                            switch (field.FieldType)
+                            {
+                                case CustomFieldType.SingleLine:
+                                    if (customField is SingleLineField singleLineField && !string.IsNullOrEmpty(singleLineField.Content))
+                                    {
+                                        displayValue = singleLineField.Content;
+                                        hasValue = true;
+                                    }
+                                    break;
+                                case CustomFieldType.MultiLine:
+                                    if (customField is MultiLineField multiLineField && !string.IsNullOrEmpty(multiLineField.Content))
+                                    {
+                                        displayValue = multiLineField.Content;
+                                        hasValue = true;
+                                    }
+                                    break;
+                                case CustomFieldType.Numeric:
+                                    if (customField is NumericField numericField)
+                                    {
+                                        displayValue = numericField.Value.ToString();
+                                        hasValue = true;
+                                    }
+                                    break;
+                                case CustomFieldType.Checkbox:
+                                    if (customField is CheckboxField checkboxField)
+                                    {
+                                        displayValue = checkboxField.IsSet ? "Да" : "Нет";
+                                        hasValue = true;
+                                    }
+                                    break;
+                                case CustomFieldType.Link:
+                                    if (customField is DocumentField documentField && !string.IsNullOrEmpty(documentField.Link))
+                                    {
+                                        displayValue = $"<a href='{documentField.Link}' target='_blank' >{documentField.Link}</a>";
+                                        hasValue = true;
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+
+                    <div class="custom-field-value @(hasValue ? "" : "empty")">
+                        @if (hasValue)
+                        {
+                            @Html.Raw(displayValue)
+                        }
+                        else
+                        {
+                            <span>@Localizer["(Нет значения)"]</span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+@if (Model.IsEdit)
+{
+    <form action="/Item/Edit/@Model.Item.PublicId" method="get">
+        <input type="hidden" name="IsEdit" value="@Model.IsEdit" />
+        <button type="submit" class="btn"> @Localizer["Edit"]
+        </button>
+    </form>
 }
-<form id="addItemForm" method="post" asp-action="Like" >
-	<input type="hidden" name="CreatorName" value="@User.Identity.Name" />
-	<input type="hidden" name="ItmId" value="@Model.Item.PublicId" />
-	@if (Model.HasChance)
-	{
-		<button id="submitBtn" type="submit" class="like-btn">like</button>
-	}
-</form>
-html
-<form action="/Item/Edit/@Model.Item.PublicId" method="get" >
-    <button type="submit" class="item-edit-btn">
-        <i class="fas fa-edit"></i> Edit
-    </button>
-</form>
+
 <script>
     $(function () {
         $("#addItemForm").on("submit", function () {

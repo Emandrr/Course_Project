@@ -8,8 +8,21 @@ using Course_Project.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
+
+using Azure;
+using Course_Project.Application.Interfaces;
+using Course_Project.Application.Services;
+using Course_Project.Application.Utils;
+using Course_Project.Domain.Models.CustomElemsModels;
+using Course_Project.Domain.Models.InventoryModels;
+using Course_Project.Web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using static Google.Apis.Requests.BatchRequest;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Course_Project.Web.Controllers
 {
@@ -29,21 +42,45 @@ namespace Course_Project.Web.Controllers
         public async Task<IActionResult> Add(Guid InventoryId)
         {
             var response = await _inventoryService.GetInventoryAsNoTrackingAsync(InventoryId.ToString());
-            if (response != null && (await Check(response) || await _inventoryService.CanEdit(response, User.Identity.Name))) 
-                return View(new ItemAddViewModel() { Inventory=response,
-                CreatorName = User.Identity.Name,
+            if (response != null && (await Check(response) || await _inventoryService.CanEdit(response, User.Identity.Name)))
+                return View(new ItemAddViewModel()
+                {
+                    Inventory = response,
+                    CreatorName = User.Identity.Name,
                     Ids = Generator.GenerateExample(response.CustomSetOfIds),
                 });
             return RedirectToAction("Index", "Home");
         }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Edit(ItemEditViewModel model)
+        {
+            var response = await _inventoryService.GetInventoryAsNoTrackingAsync(model.InvId);
+            model.Inventory = response;
+            model.Item = await _itemService.GetItemAsync(model.ItmId);
+            if (!Validator.Validate(model.CustomIdString, response.CustomSetOfIds, response.Items.Count()))
+            {
+                ModelState.AddModelError(string.Empty, "Invalid id");
+                return View(model);
+            }
+            List<CustomField> lst = Parser.ParseFields(model.CustomFields, response.Id);
+            if (ModelState.IsValid && (await Check(response) || await _inventoryService.CanEdit(response, User.Identity.Name))
+                && await _itemService.CheckOnCustomId(model.CustomIdString, model.ItmId, model.InvId))
+            {
+                await _itemService.EditItemAsync(model.Name, lst, model.CustomIdString, model.ImageFile, model.ItmId);
+                return RedirectToAction("Information", "Inventory", new { id = response.PublicId.ToString() });
+            }
+            return View(model);
+        }
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(string id, bool IsEdit)
         {
             bool value = false;
             if (User.Identity.IsAuthenticated) value = true;
             var response = await _itemService.GetItemAsNoTrackingAsync(id);
-            if (response != null) return View(new ItemEditViewModel() { Item = response, HasChance = value, IsSet = await _itemService.HasLikeAsync(User.Identity.Name, response.PublicId), Photo = await _cloudService.GetPhotoAsync(response.PhotoLink),Inventory = await _inventoryService.GetInventoryAsNoTrackingAsync(response.Inventory.PublicId.ToString()) });
+            if (response != null) return View(new ItemEditViewModel() { Item = response, HasChance = value, IsSet = await _itemService.HasLikeAsync(User.Identity.Name, response.PublicId), Photo = await _cloudService.GetPhotoAsync(response.PhotoLink), Inventory = await _inventoryService.GetInventoryAsNoTrackingAsync(response.Inventory.PublicId.ToString()) });
             else return RedirectToAction("Index", "Home");
         }
 
@@ -54,13 +91,14 @@ namespace Course_Project.Web.Controllers
             model.Inventory = response;
             if (!Validator.Validate(model.CustomIdString, response.CustomSetOfIds, response.Items.Count()))
             {
-                ModelState.AddModelError(string.Empty,"Invalid id");
+                ModelState.AddModelError(string.Empty, "Invalid id");
                 return View(model);
             }
             List<CustomField> lst = Parser.ParseFields(model.CustomFields, response.Id);
-            if (ModelState.IsValid && (await Check(response) || await _inventoryService.CanEdit(response, User.Identity.Name)))
+            if (ModelState.IsValid && (await Check(response) || await _inventoryService.CanEdit(response, User.Identity.Name))
+                && await _itemService.CheckOnCustomId(model.CustomIdString, null, model.InvId.ToString()))
             {
-                await _itemService.CreateAsync(model.Inventory.Id,model.Name,model.CreatorName,lst,model.CustomIdString, model.ImageFile);
+                await _itemService.CreateAsync(model.Inventory.Id, model.Name, model.CreatorName, lst, model.CustomIdString, model.ImageFile);
                 return RedirectToAction("Information", "Inventory", new { id = response.PublicId.ToString() });
             }
             return View(model);
@@ -68,14 +106,24 @@ namespace Course_Project.Web.Controllers
         public async Task<IActionResult> Information(string id)
         {
             bool value = false;
-            if(User.Identity.IsAuthenticated) value = true;
+            if (User.Identity.IsAuthenticated) value = true;
             var response = await _itemService.GetItemAsNoTrackingAsync(id);
-            if(response!=null)return View(new ItemViewModel() { Item=response,HasChance=value,IsSet=await _itemService.HasLikeAsync(User.Identity.Name,response.PublicId), Photo = await _cloudService.GetPhotoAsync(response.PhotoLink) });
-            else return RedirectToAction("Index","Home");
+            var inv = await _inventoryService.GetInventoryAsNoTrackingAsync(response.Inventory.PublicId.ToString());
+            if (response != null) return View(new ItemViewModel()
+            {
+                Item = response,
+                HasChance = value,
+                IsSet = await _itemService.HasLikeAsync(User.Identity.Name, response.PublicId),
+                Photo = await _cloudService.GetPhotoAsync(response.PhotoLink),
+                IsEdit = (await Check(inv) ||
+                await _inventoryService.CanEdit(inv, User.Identity.Name) || response.CreatorName == User.Identity.Name),
+                Inventory = inv
+            });
+            else return RedirectToAction("Index", "Home");
         }
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> Like(string CreatorName,Guid ItmId,bool IsSet)
+        public async Task<IActionResult> Like(string CreatorName, Guid ItmId, bool IsSet)
         {
             if (await _itemService.HasLikeAsync(CreatorName, ItmId)) await _itemService.RemoveLike(CreatorName, ItmId);
             else await _itemService.SetLike(CreatorName, ItmId);
@@ -88,5 +136,13 @@ namespace Course_Project.Web.Controllers
                 User.IsInRole("Admin")) return true;
             return false;
         }
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> DeleteSelected(Guid[] PublicId, Guid InvId)
+        {
+            await _itemService.DeleteSelectedAsync(PublicId);
+            return RedirectToAction("Details", "Inventory", new { id = InvId.ToString() });
+        }
     }
 }
+

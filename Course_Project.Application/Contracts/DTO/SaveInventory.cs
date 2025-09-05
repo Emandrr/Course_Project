@@ -14,6 +14,6 @@ namespace Course_Project.Application.Contracts.DTO
         public string? Description { get; set; }
         public int SelectedCategoryId { get; set; }
         public IFormFile? ImageFile { get; set; }
-        public string? Tags { get; set; }
+        public string? InvTags { get; set; }
     }
 }

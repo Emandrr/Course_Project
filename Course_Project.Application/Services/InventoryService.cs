@@ -77,6 +77,7 @@ namespace Course_Project.Application.Services
         }
         public async Task<bool> CanEdit(Inventory inventory,string Name)
         {
+            if (Name == null) return false;
             User user = await _userManager.FindByNameAsync(Name);
             List<string> accesses = await _inventoryRepository.GetUserAcessAsync(inventory.PublicId);
             if (inventory.IsPublic || accesses.Contains(user.Id )) return true;
@@ -101,7 +102,8 @@ namespace Course_Project.Application.Services
                 {
                     IsVisible = customElems[i].IsVisible,
                     Name = customElems[i].Name,
-                    FieldType = customElems[i].FieldType
+                    FieldType = customElems[i].FieldType,
+                    Description = customElems[i].Description
                 });
             }
         }
@@ -158,6 +160,23 @@ namespace Course_Project.Application.Services
         public async Task<List<Inventory>> TrySearchAsync(string query)
         {
             return await _inventoryRepository.TryGetByNameAsync(query);
+        }
+        public async Task<List<Inventory>> GetRecentAsync(int count)
+        {
+            return await _inventoryRepository.GetRecentAsync(count);  
+        }
+        public async Task<List<Inventory>> GetTopByItemsAsync(int count)
+        {
+            return await _inventoryRepository.GetTopByItemsAsync(count);
+        }
+        public async Task DeleteSelectedAsync(List<Guid> guids)
+        {
+            var ans = await _inventoryRepository.GetInventoryOnGuidsAsync(guids.ToList());
+            await _inventoryRepository.DeleteItemsAsync(ans);
+        }
+        public async Task<List<Inventory>> TrySearchByTagAsync(string tag)
+        {
+            return await _inventoryRepository.TryGetByTagAsync(tag);
         }
     }
 }

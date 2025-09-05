@@ -12,6 +12,8 @@ namespace Course_Project.Application.Contracts.DTO
         public string Name { get; set; }
         public CustomFieldType FieldType { get; set; }
         public bool IsVisible { get; set; }
+
+        public string? Description { get; set; }
     }
 
 }

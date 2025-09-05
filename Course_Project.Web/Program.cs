@@ -5,6 +5,7 @@ using Course_Project.DataAccess.Interfaces;
 using Course_Project.DataAccess.Repostories;
 using Course_Project.Domain.Models.UserModels;
 using Course_Project.Web.Filters;
+using Course_Project.Web.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Globalization;
 using System.Text.Json.Serialization;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -101,6 +103,7 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 });
 builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<ILikeRepository, LikeRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
@@ -109,6 +112,7 @@ builder.Services.AddScoped<IUserService,UserService>();
 builder.Services.AddScoped<IAuthService,AuthService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ICloudService,CloudService>(opt=>
 {
     return new CloudService(
@@ -120,6 +124,7 @@ builder.Services.AddScoped<ICloudService,CloudService>(opt=>
            builder.Configuration["Mail"]
        );
 });
+builder.Services.AddSignalR();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddControllersWithViews(opt =>
 {
@@ -175,5 +180,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-
+app.MapHub<CommentHub>("/commentHub");
 app.Run();

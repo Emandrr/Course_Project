@@ -15,5 +15,6 @@ namespace Course_Project.Domain.Models.CustomElemsModels
         public string Name { get; set; }
         public CustomFieldType FieldType { get; set; }
         public bool? IsVisible { get; set; } = false;
+        public string? Description { get; set; }
     }
 }

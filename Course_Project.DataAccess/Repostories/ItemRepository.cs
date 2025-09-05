@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Course_Project.DataAccess.Repostories
 {
@@ -62,6 +63,24 @@ namespace Course_Project.DataAccess.Repostories
                                  .Where(i => i.PublicId == id)
                                  .SelectMany(i => i.Likes.Select(ua => ua.UserId))
                                  .ToListAsync();
+        }
+        public async Task<Item?> GetItemByCustomIdAsync(string customid)
+        {
+            return await _context.Items.Where(i => i.CustomIdWithInventoryId == customid).AsNoTracking().FirstOrDefaultAsync();
+        }
+        public async Task<List<Item>> GetItemOnGuidsAsync(List<Guid> ids)
+        {
+            return await _context.Items.Where(c => ids.Contains(c.PublicId)).ToListAsync();
+        }
+        public async Task DeleteItemAsync(Item item)
+        {
+            _context.Items.Remove(item);
+            await SaveAllAsync();
+        }
+        public async Task DeleteItemsAsync(List<Item> items)
+        {
+            _context.Items.RemoveRange(items);
+            await SaveAllAsync();
         }
     }
 }

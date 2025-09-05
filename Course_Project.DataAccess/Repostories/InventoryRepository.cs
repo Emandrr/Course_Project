@@ -19,7 +19,7 @@ namespace Course_Project.DataAccess.Repostories
         }
         public async Task<List<Inventory>> GetInventoryAccessByIdAsync(string UserId)
         {
-            return await _context.Inventories.Where(inv => (inv.UserAccesses.Any(ua => ua.UserId == UserId) || inv.IsPublic) && inv.UserId!=UserId).ToListAsync(); 
+            return await _context.Inventories.Where(inv => (inv.UserAccesses.Any(ua => ua.UserId == UserId) || inv.IsPublic) && inv.UserId!=UserId).Include(inv=>inv.User).ToListAsync(); 
         }
         public async Task CreateAsync(Inventory inventory)
         {

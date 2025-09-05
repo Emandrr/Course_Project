@@ -8,6 +8,13 @@
         <label asp-for="Name">@Localizer["Name"]</label>
         <input asp-for="Name" class="form-control" />
     </div>
+    @if (Model.Inventory.CustomSetOfIds.Count > 0)
+    {
+        <div class="form-group">
+            <label asp-for="CustomIdString">@Localizer["Custom id"]</label>
+            <input asp-for="CustomIdString" class="form-control" />
+        </div>
+    }
     <div class = "setofid" id="customIdsValContainer">
         @foreach (var field in Model.Inventory.CustomSetOfIds)
         {
@@ -61,13 +68,6 @@
                 }
         }
     </div>
-    @if (Model.Inventory.CustomSetOfIds.Count > 0)
-    {
-        <div class="form-group">
-            <label asp-for="CustomIdString">@Localizer["Custom id"]</label>
-            <input asp-for="CustomIdString" class="form-control" />
-        </div>
-    }
     <input type="hidden" name="CreatorName" value="@User.Identity.Name" />
     <input type="hidden" name="InvId" value="@Model.Inventory.PublicId" />
     @if(Model.Inventory.CustomElems.Count>0){
@@ -106,7 +106,7 @@
                         }
                     case CustomFieldType.Link:
                         {
-                            <input type="url" name="CustomFields[@i].UrlValue" class="form-control" />
+    
                             break;
                         }
                     default:

@@ -45,13 +45,13 @@
                     </td>
                     <td>@user.Login</td>
                     <td>
-                        @if (Model.UserAccess.Contains(user.Id))
+                        @if (Model.UserAccess.Contains(user.Id) || Model.inventory.IsPublic)
                         {
-                            <span class="status-blocked">@Localizer["Has access"]</span>
+                                <span>@Localizer["Has access"]</span>
                         }
                         else
                         {
-                            <span class="status-active">@Localizer["No access"]</span>
+                            <span >@Localizer["No access"]</span>
                         }
                     </td>
                 </tr>

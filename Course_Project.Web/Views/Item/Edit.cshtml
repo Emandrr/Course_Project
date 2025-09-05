@@ -80,7 +80,6 @@
 
         <div class="form-group">
             <label>@field.Name</label>
-            <p class="text-muted">@field.Description</p>
 
             @{
                 string displayValue = "";
@@ -97,13 +96,21 @@
                                 displayValue = singleLineField.Content ?? "";
                                 <input type="text" name="CustomFields[@i].Value" value="@displayValue" class="form-control" />
                             }
+                            else
+                            {
+                            <input type="text" name="CustomFields[@i].Value" class="form-control" />
+                            }
                             break;
 
                         case CustomFieldType.MultiLine:
                             if (customField is MultiLineField multiLineField)
                             {
                                 displayValue = multiLineField.Content ?? "";
-                                <input type="text" name="CustomFields[@i].Value" value="@displayValue" class="form-control" />
+                                <textarea name="CustomFields[@i].Value" class="form-control"> value="@displayValue" </textarea>
+                            }
+                            else
+                            {
+                                <textarea name="CustomFields[@i].Value" class="form-control"></textarea>
                             }
                             break;
 
@@ -113,6 +120,10 @@
                                 displayValue = numericField.Value.ToString();
                                 <input type="number" name="CustomFields[@i].NumericValue" value="@displayValue" class="form-control" />
                             }
+                            else
+                            {
+                                <input type="number" name="CustomFields[@i].NumericValue" class="form-control" />
+                            }
                             break;
 
                         case CustomFieldType.Checkbox:
@@ -120,6 +131,10 @@
                             {
                                 displayValue = checkboxField.IsSet ? "Yes" : "No";
                                 <input type="checkbox" name="CustomFields[@i].BoolValue" value="@checkboxField.IsSet" />
+                            }
+                            else
+                            {
+                                <input type="checkbox" name="CustomFields[@i].BoolValue" value="true" />
                             }
                             break;
 
@@ -129,12 +144,50 @@
                                 displayValue = documentField.Link ?? "";
                                 <input type="url" name="CustomFields[@i].UrlValue" value="@displayValue" class="form-control" />
                             }
+                            else
+                            {
+                                <input type="url" name="CustomFields[@i].UrlValue" class="form-control" />
+
+                            }
                             break;
 
                         default:
                             displayValue = "";
                             break;
                     }
+
+                }
+                else
+                {
+                    var field1 = Model.Inventory.CustomElems[i];
+            @switch (field1.FieldType)
+            {
+                case CustomFieldType.SingleLine:
+                        {
+                            <input type="text" name="CustomFields[@i].Value" class="form-control" />
+                            break;
+                        }
+                    case CustomFieldType.MultiLine:
+                        {
+                            <textarea name="CustomFields[@i].Value" class="form-control"></textarea>
+                            break;
+                        }
+                    case CustomFieldType.Numeric:
+                        {
+                            <input type="number" name="CustomFields[@i].NumericValue" class="form-control" />
+                            break;
+                        }
+                    case CustomFieldType.Checkbox:
+                        {
+                            <input type="checkbox" name="CustomFields[@i].BoolValue" value="true" />
+                            break;
+                        }
+                    case CustomFieldType.Link:
+                        {
+                            <input type="url" name="CustomFields[@i].UrlValue" class="form-control" />
+                            break;
+                        }
+                }
                 }
             }
 

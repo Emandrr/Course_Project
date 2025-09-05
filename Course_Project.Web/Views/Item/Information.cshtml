@@ -20,7 +20,7 @@
             <div class="item-meta">
                 <div class="item-creator">@Localizer["Created"]: @Model.Item.CreatorName</div>
             <div class="item-date">@Localizer["Created on"] Utc: @Model.Item.CreationDate.ToString("dd.MM.yyyy HH:mm:ss")</div>
-            <div class="item-cst-id">@Localizer["Custom Id"]: @Model.Item.CustomId</div>
+            <div class="item-cst-id">@Localizer["Custom id"]: @Model.Item.CustomId</div>
             </div>
             <div class="item-actions">
                 <div class="like-section">
@@ -50,54 +50,54 @@
                 var field = Model.Inventory.CustomElems[i];
                 <div class="custom-field">
                     <div class="custom-field-label">@field.Name</div>
+                <p class="text-muted">@field.Description</p>
+                @{
+                    string displayValue = "";
+                    bool hasValue = false;
 
-                    @{
-                        string displayValue = "";
-                        bool hasValue = false;
-
-                        if (i < Model.Item.CustomFields.Count)
+                    if (i < Model.Item.CustomFields.Count)
+                    {
+                        var customField = Model.Item.CustomFields[i];
+                        switch (field.FieldType)
                         {
-                            var customField = Model.Item.CustomFields[i];
-                            switch (field.FieldType)
-                            {
-                                case CustomFieldType.SingleLine:
-                                    if (customField is SingleLineField singleLineField && !string.IsNullOrEmpty(singleLineField.Content))
-                                    {
-                                        displayValue = singleLineField.Content;
-                                        hasValue = true;
-                                    }
-                                    break;
-                                case CustomFieldType.MultiLine:
-                                    if (customField is MultiLineField multiLineField && !string.IsNullOrEmpty(multiLineField.Content))
-                                    {
-                                        displayValue = multiLineField.Content;
-                                        hasValue = true;
-                                    }
-                                    break;
-                                case CustomFieldType.Numeric:
-                                    if (customField is NumericField numericField)
-                                    {
-                                        displayValue = numericField.Value.ToString();
-                                        hasValue = true;
-                                    }
-                                    break;
-                                case CustomFieldType.Checkbox:
-                                    if (customField is CheckboxField checkboxField)
-                                    {
-                                        displayValue = checkboxField.IsSet ? "Да" : "Нет";
-                                        hasValue = true;
-                                    }
-                                    break;
-                                case CustomFieldType.Link:
-                                    if (customField is DocumentField documentField && !string.IsNullOrEmpty(documentField.Link))
-                                    {
-                                        displayValue = $"<a href='{documentField.Link}' target='_blank' >{documentField.Link}</a>";
-                                        hasValue = true;
-                                    }
-                                    break;
-                            }
+                            case CustomFieldType.SingleLine:
+                                if (customField is SingleLineField singleLineField && !string.IsNullOrEmpty(singleLineField.Content))
+                                {
+                                    displayValue = singleLineField.Content;
+                                    hasValue = true;
+                                }
+                                break;
+                            case CustomFieldType.MultiLine:
+                                if (customField is MultiLineField multiLineField && !string.IsNullOrEmpty(multiLineField.Content))
+                                {
+                                    displayValue = multiLineField.Content;
+                                    hasValue = true;
+                                }
+                                break;
+                            case CustomFieldType.Numeric:
+                                if (customField is NumericField numericField)
+                                {
+                                    displayValue = numericField.Value.ToString();
+                                    hasValue = true;
+                                }
+                                break;
+                            case CustomFieldType.Checkbox:
+                                if (customField is CheckboxField checkboxField)
+                                {
+                                    displayValue = checkboxField.IsSet ? "Да" : "Нет";
+                                    hasValue = true;
+                                }
+                                break;
+                            case CustomFieldType.Link:
+                                if (customField is DocumentField documentField && !string.IsNullOrEmpty(documentField.Link))
+                                {
+                                    displayValue = $"<a href='{documentField.Link}' target='_blank' >{documentField.Link}</a>";
+                                    hasValue = true;
+                                }
+                                break;
                         }
                     }
+                }
 
                     <div class="custom-field-value @(hasValue ? "" : "empty")">
                         @if (hasValue)

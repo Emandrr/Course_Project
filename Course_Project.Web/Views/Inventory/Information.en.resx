@@ -168,4 +168,7 @@
   <data name="Category" xml:space="preserve">
     <value>Category</value>
   </data>
+  <data name="Custom id" xml:space="preserve">
+    <value>Custom id</value>
+  </data>
 </root>

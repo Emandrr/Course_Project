@@ -168,4 +168,7 @@
   <data name="Category" xml:space="preserve">
     <value>Категория</value>
   </data>
+  <data name="Custom id" xml:space="preserve">
+    <value>Кастомное айди</value>
+  </data>
 </root>

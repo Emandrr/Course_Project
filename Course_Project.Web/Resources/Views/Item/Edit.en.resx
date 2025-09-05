@@ -147,8 +147,8 @@
   <data name="Custom fields" xml:space="preserve">
     <value>Кастомное поле</value>
   </data>
-  <data name="Custom id" xml:space="preserve">
-    <value>Кастомное айди</value>
+  <data name="Custom Id" xml:space="preserve">
+    <value>Custom id</value>
   </data>
   <data name="Edit item" xml:space="preserve">
     <value>Edit item</value>

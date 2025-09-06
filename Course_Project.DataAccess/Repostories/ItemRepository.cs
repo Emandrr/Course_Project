@@ -54,6 +54,7 @@ namespace Course_Project.DataAccess.Repostories
         }
         public async Task UpdateAsync(Item item)
         {
+            item.Version++;
             _context.Items.Update(item);
             await SaveAllAsync();
         }

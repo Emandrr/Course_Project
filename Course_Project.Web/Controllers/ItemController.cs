@@ -9,21 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-
-using Azure;
-using Course_Project.Application.Interfaces;
-using Course_Project.Application.Services;
-using Course_Project.Application.Utils;
-using Course_Project.Domain.Models.CustomElemsModels;
-using Course_Project.Domain.Models.InventoryModels;
-using Course_Project.Web.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using static Google.Apis.Requests.BatchRequest;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-
 namespace Course_Project.Web.Controllers
 {
     public class ItemController : Controller
@@ -48,17 +33,19 @@ namespace Course_Project.Web.Controllers
                     Inventory = response,
                     CreatorName = User.Identity.Name,
                     Ids = Generator.GenerateExample(response.CustomSetOfIds),
+                    ReturnUrl = Request.Headers["Referer"].ToString()
                 });
             return RedirectToAction("Index", "Home");
         }
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> Edit(ItemEditViewModel model)
+        public async Task<IActionResult> Edit(ItemEditViewModel model, int Version)
         {
             var response = await _inventoryService.GetInventoryAsNoTrackingAsync(model.InvId);
             model.Inventory = response;
             model.Item = await _itemService.GetItemAsync(model.ItmId);
+            if(model.Item.Version!=Version) return RedirectToAction("Information", "Inventory", new { id = response.PublicId.ToString() });
             if (!Validator.Validate(model.CustomIdString, response.CustomSetOfIds, response.Items.Count()))
             {
                 ModelState.AddModelError(string.Empty, "Invalid id");
@@ -80,7 +67,12 @@ namespace Course_Project.Web.Controllers
             bool value = false;
             if (User.Identity.IsAuthenticated) value = true;
             var response = await _itemService.GetItemAsNoTrackingAsync(id);
-            if (response != null) return View(new ItemEditViewModel() { Item = response, HasChance = value, IsSet = await _itemService.HasLikeAsync(User.Identity.Name, response.PublicId), Photo = await _cloudService.GetPhotoAsync(response.PhotoLink), Inventory = await _inventoryService.GetInventoryAsNoTrackingAsync(response.Inventory.PublicId.ToString()) });
+            if (response != null) return View(new ItemEditViewModel() { Item = response, HasChance = value, 
+                IsSet = await _itemService.HasLikeAsync(User.Identity.Name, 
+                response.PublicId), Photo = await _cloudService.GetPhotoAsync(response.PhotoLink), 
+                Inventory = await _inventoryService.GetInventoryAsNoTrackingAsync(response.Inventory.PublicId.ToString()),
+                ReturnUrl = Request.Headers["Referer"].ToString()
+            });
             else return RedirectToAction("Index", "Home");
         }
 
@@ -117,7 +109,8 @@ namespace Course_Project.Web.Controllers
                 Photo = await _cloudService.GetPhotoAsync(response.PhotoLink),
                 IsEdit = (await Check(inv) ||
                 await _inventoryService.CanEdit(inv, User.Identity.Name) || response.CreatorName == User.Identity.Name),
-                Inventory = inv
+                Inventory = inv,
+                ReturnUrl = Request.Headers["Referer"].ToString()
             });
             else return RedirectToAction("Index", "Home");
         }

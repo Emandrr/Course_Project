@@ -1,5 +1,6 @@
 ﻿<form method="post" enctype="multipart/form-data">
 <link rel="stylesheet" href="~/css/settings.css" />
+    <input type="hidden" name="Version" value="@Model.inventory.Version" />
 <div class="inventory-edit-container">
 
         <input type="hidden" name="id" value="@Model.inventory.PublicId" />

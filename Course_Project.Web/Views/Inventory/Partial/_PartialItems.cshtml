@@ -1,5 +1,6 @@
 ﻿<form method="post" asp-action="DeleteSelected" asp-controller="Item">
     <input type="hidden" name="InvId" value="@Model.inventory.PublicId" />
+    <input type="hidden" name="Version" value="@Model.inventory.Version" />
     <button type="submit" class="btn btn-ed" asp-action="DeleteSelected" asp-controller="Item" id="blockBtn">
         <i class="fas fa-ban me-1"></i>@Localizer["Delete"]
     </button>

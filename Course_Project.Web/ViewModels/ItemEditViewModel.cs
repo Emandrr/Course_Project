@@ -23,5 +23,8 @@ namespace Course_Project.Web.ViewModels
         public string? ItmId { get; set; }
         public string? InvId { get; set; }
         public string? Photo { get; set; }
+        public string? ReturnUrl { get; set; }
+
+
     }
 }

@@ -27,5 +27,6 @@ namespace Course_Project.Domain.Models.InventoryModels
         public DateTime CreationDate { get; set; }
         public int CategoryId { get; set; }
         public Category Category { get; set; }
+        public int Version { get; set; }
     }
 }

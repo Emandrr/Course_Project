@@ -10,5 +10,6 @@ namespace Course_Project.Web.ViewModels
         public bool IsEdit { get; set; }
         public string? Photo { get; set; }
         public Inventory? Inventory { get; set; }
+        public string? ReturnUrl { get; set; }
     }
 }

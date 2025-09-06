@@ -75,6 +75,7 @@ namespace Course_Project.DataAccess.Repostories
         }
         public async Task UpdateAsync(Inventory inventory)
         {
+            inventory.Version++;
             _context.Inventories.Update(inventory);
             await SaveAllAsync();
         }
@@ -89,6 +90,7 @@ namespace Course_Project.DataAccess.Repostories
         public async Task TakeAccessAsync(List<string> UserIds, Guid inventoryId)
         {
             var rsp = await _context.Inventories.Where(p => p.PublicId == inventoryId).FirstOrDefaultAsync();
+            rsp.Version++;
             await _context.UserInventoryAccess
                           .Where(ua => ua.InventoryId == rsp.Id && UserIds.Contains(ua.UserId))
                           .ExecuteDeleteAsync();
@@ -102,6 +104,7 @@ namespace Course_Project.DataAccess.Repostories
                 UserId = userId,
                 InventoryId = rsp.Id
             }).ToList();
+            rsp.Version++;
             await _context.UserInventoryAccess.AddRangeAsync(newAccesses);
             await SaveAllAsync();
         }

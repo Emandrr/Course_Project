@@ -92,10 +92,10 @@ namespace Course_Project.Web.Controllers
             }
             [Authorize]
             [HttpPost]
-            public async Task<JsonResult> UpdateElems(List<CustomElem> customElems, Guid inventoryId)
+            public async Task<JsonResult> UpdateElems(List<CustomElem> customElems, Guid inventoryId,int Version)
             {
                 Inventory inventory = await _inventoryService.GetInventoryAsync(inventoryId.ToString());
-                if (inventory == null || !(await Check(inventory))) RedirectToAction("Index", "Home");
+                if (inventory == null || !(await Check(inventory)) || Version!=inventory.Version) RedirectToAction("Index", "Home");
                 if (ModelState.IsValid)
                 {
                     await _inventoryService.UpdateCustomElemsAsync(customElems, inventory);
@@ -106,57 +106,57 @@ namespace Course_Project.Web.Controllers
             }
             [Authorize]
             [HttpPost]
-            public async Task<JsonResult> UpdateCustomId(List<CustomSetOfId> customSetOfIds, List<string> ids, Guid inventoryId)
+            public async Task<JsonResult> UpdateCustomId(List<CustomSetOfId> customSetOfIds, List<string> ids, Guid inventoryId,int Version)
             {
                 Inventory inventory = await _inventoryService.GetInventoryAsync(inventoryId.ToString());
-                if (inventory == null || !(await Check(inventory))) RedirectToAction("Index", "Home");
+                if (inventory == null || !(await Check(inventory)) || Version != inventory.Version) RedirectToAction("Index", "Home");
                 await _inventoryService.UpdateCustomSetOfIdsAsync(customSetOfIds, inventory);
                 return Json(new { success = true });
             }
             [Authorize]
             [HttpPost]
-            public async Task<IActionResult> MakePublic(Guid id)
+            public async Task<IActionResult> MakePublic(Guid id,int Version)
             {
                 Inventory inventory = await _inventoryService.GetInventoryAsync(id.ToString());
-                if (inventory == null || !(await Check(inventory))) RedirectToAction("Index", "Home");
+                if (inventory == null || !(await Check(inventory)) || Version != inventory.Version) RedirectToAction("Index", "Home");
                 inventory.IsPublic = true;
                 await _inventoryService.UpdateAsync(inventory);
                 return RedirectToAction("Details", new { id = id.ToString() });
             }
             [Authorize]
             [HttpPost]
-            public async Task<IActionResult> MakePrivate(Guid id)
+            public async Task<IActionResult> MakePrivate(Guid id,int Version)
             {
                 Inventory inventory = await _inventoryService.GetInventoryAsync(id.ToString());
-                if (inventory == null || !(await Check(inventory))) RedirectToAction("Index", "Home");
+                if (inventory == null || !(await Check(inventory)) || Version != inventory.Version) RedirectToAction("Index", "Home");
                 inventory.IsPublic = false;
                 await _inventoryService.UpdateAsync(inventory);
                 return RedirectToAction("Details", new { id = id.ToString() });
             }
             [Authorize]
             [HttpPost]
-            public async Task<IActionResult> GiveAccess(string[] UserId, Guid id)
+            public async Task<IActionResult> GiveAccess(string[] UserId, Guid id,int Version)
             {
                 Inventory inventory = await _inventoryService.GetInventoryAsync(id.ToString());
-                if (inventory == null || !(await Check(inventory))) RedirectToAction("Index", "Home");
+                if (inventory == null || !(await Check(inventory)) || Version != inventory.Version) RedirectToAction("Index", "Home");
                 await _inventoryService.GiveAccessSelectedAsync(UserId, id);
                 return RedirectToAction("Details", new { id = id.ToString() });
             }
             [Authorize]
             [HttpPost]
-            public async Task<IActionResult> TakeAccess(string[] UserId, Guid id)
+            public async Task<IActionResult> TakeAccess(string[] UserId, Guid id, int Version)
             {
                 Inventory inventory = await _inventoryService.GetInventoryAsync(id.ToString());
-                if (inventory == null || !(await Check(inventory))) RedirectToAction("Index", "Home");
+                if (inventory == null || !(await Check(inventory)) || Version != inventory.Version) RedirectToAction("Index", "Home");
                 await _inventoryService.TakeAccessSelectedAsync(UserId, id);
                 return RedirectToAction("Details", new { id = id.ToString() });
             }
             [Authorize]
             [HttpPost]
-            public async Task<IActionResult> Save(SaveInventory saveInventory)
+            public async Task<IActionResult> Save(SaveInventory saveInventory, int Version)
             {
                 Inventory inventory = await _inventoryService.GetInventoryAsync(saveInventory.Id.ToString());
-                if (inventory == null || !(await Check(inventory))) RedirectToAction("Index", "Home");
+                if (inventory == null || !(await Check(inventory)) || Version != inventory.Version) RedirectToAction("Index", "Home");
                 await _inventoryService.UpdateMainFieldsAsync(saveInventory.Title, saveInventory.Description, saveInventory.ImageFile, saveInventory.SelectedCategoryId, inventory);
                 await _tagService.UpdateTagsForInventoryAsync(inventory.PublicId.ToString(), System.Text.Json.JsonSerializer.Deserialize<List<string>>(saveInventory.InvTags) ?? new List<string>());
                 return RedirectToAction("Details", new { id = saveInventory.Id.ToString() });

@@ -40,7 +40,8 @@ namespace Course_Project.Application.Services
                 UserId = UserId,
                 CreationDate = DateTime.UtcNow,
                 PublicId = Guid.NewGuid(),
-                Category = category
+                Category = category,
+                Version = 1
             };
         }
         public async Task<Guid> CreateAsync(string Title, string Description, bool IsPublic, List<CustomIdRule> CustomSetOfIds, List<Item> Items, List<CustomFieldOption> CustomElems, IFormFile file, string UserId,int categoryId)

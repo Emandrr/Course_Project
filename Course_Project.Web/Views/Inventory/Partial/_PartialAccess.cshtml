@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="~/css/admin.css" />
 <form method="post">
     <input type="hidden" name="id" value="@Model.inventory.PublicId" />
+    <input type="hidden" name="Version" value="@Model.inventory.Version" />
     <nav class="nav navbar d-flex justify-content-between align-items-center">
         <div class="nav-item">
             @if (!Model.inventory.IsPublic)

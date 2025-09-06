@@ -13,6 +13,7 @@
 
     <div class="id-sidebar">
         <form method="post" asp-controller="inventory" asp-action="UpdateCustomId" enctype="multipart/form-data" id="customIdsForm">
+            <input type="hidden" name="Version" value="@Model.inventory.Version" />
             <div id="customIdsContainer">
                 @for (int i = 0; i < ViewData.Model.inventory.CustomSetOfIds.Count; i++)
                 {
@@ -111,6 +112,7 @@
 
             const formData = new FormData($('#customIdsForm')[0]);
             formData.append('inventoryId', '@Model.inventory.PublicId' );
+            formData.append('Version','@Model.inventory.Version');
             $.ajax({
                 url: '/Inventory/UpdateCustomId',
                 type: 'POST',

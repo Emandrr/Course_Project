@@ -1,7 +1,8 @@
 ﻿@model ItemViewModel
 <link rel="stylesheet" href="~/css/item-info.css" />
-
-
+<button type="button" class="back-arrow" onclick="window.location.href='@Model.ReturnUrl'">
+    <i class="bi bi-arrow-left"></i>
+</button>
     <div class="item-header">
         <div class="item-avatar">
             @if (!string.IsNullOrEmpty(Model.Photo))

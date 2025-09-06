@@ -258,11 +258,23 @@ body {
     margin: 10px;
 }
 #inventoryTable tbody tr {
-    cursor: pointer; 
+    cursor: pointer !important;
 }
-#inventoryTable thead th {
-    cursor: pointer; 
+
+#hometable2 tbody tr {
+    cursor: pointer !important;
 }
+
+
+#hometable tbody tr {
+    cursor: pointer !important;
+}
+
+
+#searchtable tbody tr {
+    cursor: pointer !important;
+}
+
 
 @media (max-width: 768px) {
     .navbar-search {

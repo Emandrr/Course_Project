@@ -22,5 +22,6 @@ namespace Course_Project.Domain.Models.InventoryModels
         public Inventory? Inventory { get; set; }
         public List<Like> Likes { get; set; } = new List<Like>();
         public string? PhotoLink { get; set; }
+        public int Version { get; set; }
     }
 }

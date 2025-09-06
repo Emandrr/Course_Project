@@ -45,7 +45,8 @@ namespace Course_Project.Application.Services
                 CreationDate = DateTime.UtcNow,
                 PublicId = Guid.NewGuid(),
                 PhotoLink = file == null ? _fileId : _cloudService.UploadPhoto(_folderId, file),
-                CustomIdWithInventoryId = CustomId+InventoryId.ToString()
+                CustomIdWithInventoryId = CustomId+InventoryId.ToString(),
+                Version = 1
             }; 
         }
         public async Task<Guid> CreateAsync(int InventoryId, string Name, string CreatorName, List<CustomField> CustomFields, string CustomId, IFormFile file)

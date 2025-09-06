@@ -1,9 +1,13 @@
 ﻿@model Course_Project.Web.ViewModels.ItemEditViewModel
 
 <link href="~/css/item-add.css" rel="stylesheet" />
+<button type="button" class="back-arrow" onclick="window.location.href='@Model.ReturnUrl'">
+    <i class="bi bi-arrow-left"></i>
+</button>
 <h2>@Localizer["Edit Item"]</h2>
 
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="Version" value="@Model.Item.Version" />
     <div class="form-group">
         <label asp-for="Name">@Localizer["Name"]</label>
         <input asp-for="Name" value="@Model.Item.Name" class="form-control" />

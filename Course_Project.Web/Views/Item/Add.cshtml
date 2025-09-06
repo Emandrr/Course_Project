@@ -2,7 +2,9 @@
 
 <link href="~/css/item-add.css" rel="stylesheet" />
 <h2>@Localizer["Add Item"]</h2>
-
+<button type="button" class="back-arrow" onclick="window.location.href='@Model.ReturnUrl'">
+    <i class="bi bi-arrow-left"></i>
+</button>
 <form asp-action="Add" method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label asp-for="Name">@Localizer["Name"]</label>

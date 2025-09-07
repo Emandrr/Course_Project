@@ -13,7 +13,6 @@
 
     <div class="id-sidebar">
         <form method="post" asp-controller="inventory" asp-action="UpdateCustomId" enctype="multipart/form-data" id="customIdsForm">
-            <input type="hidden" name="Version" value="@Model.inventory.Version" />
             <div id="customIdsContainer">
                 @for (int i = 0; i < ViewData.Model.inventory.CustomSetOfIds.Count; i++)
                 {
@@ -86,6 +85,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
     $(document).ready(function () {
+    localStorage.removeItem("inventoryVersion");
+            if (!localStorage.getItem("inventoryVersion")) {
+        localStorage.setItem("inventoryVersion", "@Model.inventory.Version");
+        console.log(localStorage.getItem("inventoryVersion"))
+    }
         let elemIndex = $('#customIdsContainer .custom-id-group').length; 
         let Changes = false;
         let Timer = null;
@@ -109,10 +113,10 @@
         function saveFormCustomId() {
             if (!Changes) return;
             updateSaveStatus('saving');
-
+            let version = parseInt(localStorage.getItem("inventoryVersion") || "1");
             const formData = new FormData($('#customIdsForm')[0]);
             formData.append('inventoryId', '@Model.inventory.PublicId' );
-            formData.append('Version','@Model.inventory.Version');
+            formData.append('Version',version);
             $.ajax({
                 url: '/Inventory/UpdateCustomId',
                 type: 'POST',
@@ -120,6 +124,9 @@
                 processData: false,
                 contentType: false,
                 success: function(response) {
+                        if (response.newVersion) {
+                            localStorage.setItem("inventoryVersion", response.newVersion);
+                        }
                     updateSaveStatus('saved');
                     Changes = false;
                 },

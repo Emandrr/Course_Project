@@ -2,7 +2,6 @@
 	<h3 class="elements-title">@Localizer["Custom elements"]</h3>
 <div class="elements-sidebar">
 		<form method="post" asp-controller="inventory" asp-action="UpdateElems" enctype="multipart/form-data" id="customElemsForm">
-			<input type="hidden" name="Version" value="@Model.inventory.Version" />
 	<div id="customElemsContainer">
 		@for (int i = 0; i < ViewData.Model.inventory.CustomElems.Count; i++)
 		{
@@ -49,6 +48,9 @@
 
 <script>
 	$(document).ready(function () {
+		if (!localStorage.getItem("inventoryVersion")) {
+				localStorage.setItem("inventoryVersion", "@Model.inventory.Version");
+				}
 		let elemIndex = @ViewData.Model.inventory.CustomElems.Count;
 		let hasChanges = false;
 		let saveTimer = null;
@@ -68,10 +70,10 @@
 			if (!hasChanges) return;
 
 			updateSaveStatus('saving');
-
+			let version = parseInt(localStorage.getItem("inventoryVersion") || "1");
 			const formData = new FormData($('#customElemsForm')[0]);
 			formData.append('inventoryId', '@Model.inventory.PublicId');
-			formData.append('Version','@Model.inventory.Version');
+			formData.append('Version',version);
 			$.ajax({
 				url: '/Inventory/UpdateElems',
 				type: 'POST',
@@ -79,6 +81,7 @@
 				processData: false,
 				contentType: false,
 				success: function(response) {
+					localStorage.setItem("inventoryVersion", version + 1);
 					updateSaveStatus('saved');
 					hasChanges = false;
 				},

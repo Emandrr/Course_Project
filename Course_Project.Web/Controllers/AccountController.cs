@@ -19,6 +19,19 @@ namespace Course_Project.Web.Controllers
             _inventoryService = inventoryService;
             _cloudService = cloudService;
         }
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> CreateSalesforceAccount(string name, SalesforceAccountViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+            var answer = await _userService.AuthToSalesforceAsync(name,model.CompanyName,model.ContactFirstName,model.ContactLastName,model.ContactEmail);
+            if (answer)
+                TempData["Success"] = "Account и Contact успешно созданы в Salesforce!";
+            else
+                TempData["Error"] = "Ошибка при создании в Salesforce.";
+            return RedirectToAction("Index","Account" ,new { id=name });
+        }
         public async Task<IActionResult> Index(string id)
         {
             var response = await _userService.GetOneByNameAsync(id);

@@ -15,11 +15,13 @@ namespace Course_Project.Application.Services
         private UserManager<User> _userManager;
         private readonly string _folderId = "1o_vyB7A01EsYmwT-Aoaj4eaHny_kB1E7";
         private readonly string _fileId = "1-MNB5BJ85Z6fOH01php9t2ym6syx6De4";
+        private readonly ISalesforceService _salesforceService;
         private readonly ICloudService _cloudService;
-        public UserService(UserManager<User> userManager, ICloudService cloudService)
+        public UserService(UserManager<User> userManager, ICloudService cloudService, ISalesforceService salesforceService)
         {
             _userManager = userManager;
             _cloudService = cloudService;
+            _salesforceService = salesforceService;
         }
 
         public User Create(string Email,string Login)
@@ -121,6 +123,13 @@ namespace Course_Project.Application.Services
         public async Task<User?> GetOneByNameAsync(string? name)
         {
             return await _userManager.Users.Where(p=>p.UserName==name).AsNoTracking().FirstOrDefaultAsync();   
+        }
+        public async Task<bool> AuthToSalesforceAsync(string name, string CompanyName, string ContactFirstName, string ContactLastName, string ContactEmail)
+        {
+           User user =  await _userManager.Users.Where(p => p.UserName == name).FirstOrDefaultAsync();
+           user.IsSalesforceConnected = await _salesforceService.CreateAccountWithContactAsync(CompanyName,ContactFirstName,ContactLastName,ContactEmail);
+           await _userManager.UpdateAsync(user);
+           return user.IsSalesforceConnected;
         }
     }
 }

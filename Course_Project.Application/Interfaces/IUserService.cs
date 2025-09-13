@@ -22,5 +22,6 @@ namespace Course_Project.Application.Interfaces
         public Task<bool> DeleteAllSelectedAsync(string[] UserId);
         public Task<bool> DeleteSelectedNotSelfAsync(string SelectedId);
         public Task<User?> GetOneByNameAsync(string? name);
+        public Task<bool> AuthToSalesforceAsync(string name, string CompanyName, string ContactFirstName, string ContactLastName, string ContactEmail);
     }
 }

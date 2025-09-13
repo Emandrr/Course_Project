@@ -113,6 +113,7 @@ builder.Services.AddScoped<IAuthService,AuthService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddHttpClient<ISalesforceService, SalesforceService>();
 builder.Services.AddScoped<ICloudService,CloudService>(opt=>
 {
     return new CloudService(

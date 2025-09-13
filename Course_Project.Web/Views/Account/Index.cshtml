@@ -20,10 +20,58 @@
         <h1>@Model.user.Email</h1>
     </div>
 </div>
+@if (!Model.user.IsSalesforceConnected && (User.Identity.Name==Model.user.UserName || User.IsInRole("Admin")))
+{
+    <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#salesforceModal" style="margin-block-end:10px; width:20rem;">
+        @Localizer["Sync with Salesforce"]
+    </button>
 
+
+    <div class="modal fade" id="salesforceModal" tabindex="-1" aria-labelledby="salesforceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="post" asp-action="CreateSalesforceAccount" asp-route-userId="@Model.user.Id">
+
+                    <div class="modal-body">
+                        <input type="hidden" name="name" value="@Model.user.UserName" />
+
+                        <div class="mb-3">
+                            <label for="CompanyName" class="form-label">@Localizer["Company Name"]</label>
+                            <input type="text" class="form-control" id="CompanyName" name="CompanyName" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ContactFirstName" class="form-label">@Localizer["First Name"]</label>
+                            <input type="text" class="form-control" id="ContactFirstName" name="ContactFirstName" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ContactLastName" class="form-label">@Localizer["Last Name"]</label>
+                            <input type="text" class="form-control" id="ContactLastName" name="ContactLastName" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ContactEmail" class="form-label">@Localizer["Email"]</label>
+                            <input type="email" class="form-control" id="ContactEmail" name="ContactEmail" required />
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                        <button type="submit" class="btn btn-primary">@Localizer["Create in Salesforce"]</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+
+}
 <form method="post">
 <div class="cont">
-    <a asp-controller="Inventory" asp-action="Create" asp-route-id="@Model.user.Id" class="btn">@Localizer["Create new inventory"]</a>
+        <a asp-controller="Inventory" asp-action="Create" asp-route-id="@Model.user.Id" class="btn" style="width:20rem;"> @Localizer["Create new inventory"]</a>
         <input type="hidden" name="UserName" value="@Model.user.UserName" />
     <div class="tab-container">
         <nav>
@@ -98,13 +146,8 @@
      </div>
 </div>
 </form>
+
 <script>
-        document.getElementById('selectDeselect').addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('.checkboxtable');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
-    });
     $(document).ready(function () {
         const myTab = document.querySelector(".my-tab-content");
         const editTab = document.querySelector(".edit-tab-content");

@@ -126,6 +126,12 @@
   <data name="All inventories" xml:space="preserve">
     <value>All inventories</value>
   </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
   <data name="Home" xml:space="preserve">
     <value>Home</value>
   </data>
@@ -137,6 +143,9 @@
   </data>
   <data name="Register" xml:space="preserve">
     <value>Register</value>
+  </data>
+  <data name="Save changes" xml:space="preserve">
+    <value>Save changes</value>
   </data>
   <data name="Search inventory by name..." xml:space="preserve">
     <value>Search inventory by name...</value>

@@ -125,6 +125,7 @@ builder.Services.AddScoped<ICloudService,CloudService>(opt=>
            builder.Configuration["Mail"]
        );
 });
+builder.Services.AddScoped<IDropBoxService, DropboxService>();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddControllersWithViews(opt =>

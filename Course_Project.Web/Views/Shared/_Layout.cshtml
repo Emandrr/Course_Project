@@ -47,6 +47,7 @@
                             </button>
                         </div>
                     </form>
+                   
                     <form asp-action="SetLanguage" asp-controller="Home" method="post">
                         <input type="hidden" name="lang" value="@(CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ru" ? "en" : "ru")" />
                         <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
@@ -58,11 +59,15 @@
                     <div class="auth-buttons-container">
                         @if (!User.Identity.IsAuthenticated)
                         {
+
                             <a asp-controller="Auth" asp-action="Login" class="btn">@Localizer["Login"]</a>
                             <a asp-controller="Auth" asp-action="Register" class="btn">@Localizer["Register"]</a>
                         }
                         else
                         {
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#priorityModal">
+                                @Localizer["Help"]
+                            </button>
                             @if (User.IsInRole("Admin"))
                             {
                                 <a asp-controller="Admin" asp-action="Index" class="btn">@Localizer["Admin"]</a>
@@ -75,6 +80,32 @@
             </div>
         </nav>
         <partial name="_ThemeLink" />
+        <div class="modal fade" id="priorityModal" tabindex="-1" aria-labelledby="priorityModalLabel" aria-hidden="true" style="z-index: 9999;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="priorityModalLabel">@Localizer["Select Priority"]</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form asp-action="SendTicket" asp-controller="Home" method="post">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="prioritySelect" class="form-label">Priority</label>
+                                <select class="form-select" id="prioritySelect" name="Priority" required>
+                                    <option value="High">High</option>
+                                    <option value="Average">Average</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Close"]</button>
+                            <button type="submit" class="btn btn-primary">@Localizer["Save changes"]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </header>
     
     @RenderBody()

@@ -126,6 +126,12 @@
   <data name="All inventories" xml:space="preserve">
     <value>Все инвентари</value>
   </data>
+  <data name="Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Помощь</value>
+  </data>
   <data name="Home" xml:space="preserve">
     <value>Главная</value>
   </data>
@@ -137,6 +143,9 @@
   </data>
   <data name="Register" xml:space="preserve">
     <value>Регистрация</value>
+  </data>
+  <data name="Save changes" xml:space="preserve">
+    <value>Сохранить изменения</value>
   </data>
   <data name="Search inventory by name..." xml:space="preserve">
     <value>Найти инвентарь по имени...</value>
